@@ -1,0 +1,19 @@
+{
+  "id": "w2-l05",
+  "worldId": "world-2",
+  "order": 5,
+  "tier": "block-text",
+  "scenario": "robot-grid",
+  "titleKey": "levels:w2-l05.title",
+  "toolboxRef": "block-text",
+  "goal": {
+    "gridWidth": 6,
+    "gridHeight": 6,
+    "start": { "x": 0, "y": 0 },
+    "startDirection": "east",
+    "target": { "x": 5, "y": 5 }
+  },
+  "starRules": { "threeStar": { "maxBlocks": 6 } },
+  "concepts": ["loop", "turn"],
+  "hints": ["levels:w2-l05.hint1", "levels:w2-l05.hint2"]
+}

@@ -17,9 +17,20 @@ const DIRECTION_ROTATION: Record<RobotState['direction'], number> = {
 interface RobotGridCanvasProps {
   goal: RobotGridGoal;
   robotState: RobotState;
+  /** Glyph overrides let a World reskin the scenario narratively (e.g. AI
+   * Lab's "data point" target) without touching the renderer or engine. */
+  robotGlyph?: string;
+  crashGlyph?: string;
+  targetGlyph?: string;
 }
 
-export function RobotGridCanvas({ goal, robotState }: RobotGridCanvasProps) {
+export function RobotGridCanvas({
+  goal,
+  robotState,
+  robotGlyph = '\u{1F916}',
+  crashGlyph = '\u{1F4A5}',
+  targetGlyph = '\u{1F3C1}',
+}: RobotGridCanvasProps) {
   const width = goal.gridWidth * CELL;
   const height = goal.gridHeight * CELL;
   const obstacleSet = new Set((goal.obstacles ?? []).map((o) => `${o.x},${o.y}`));
@@ -44,7 +55,7 @@ export function RobotGridCanvas({ goal, robotState }: RobotGridCanvasProps) {
       if (isTarget) {
         cells.push(
           <text key={`flag-${x}-${y}`} x={x * CELL + CELL / 2} y={y * CELL + CELL / 2 + 8} className="grid-flag">
-            {'\u{1F3C1}'}
+            {targetGlyph}
           </text>,
         );
       }
@@ -70,7 +81,7 @@ export function RobotGridCanvas({ goal, robotState }: RobotGridCanvasProps) {
           textAnchor="middle"
           className={robotState.crashed ? 'grid-robot grid-robot--crashed' : 'grid-robot'}
         >
-          {robotState.crashed ? '\u{1F4A5}' : '\u{1F916}'}
+          {robotState.crashed ? crashGlyph : robotGlyph}
         </text>
       </g>
     </svg>

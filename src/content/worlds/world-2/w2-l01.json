@@ -1,0 +1,18 @@
+{
+  "id": "w2-l01",
+  "worldId": "world-2",
+  "order": 1,
+  "tier": "icon",
+  "scenario": "robot-grid",
+  "toolboxRef": "icon",
+  "goal": {
+    "gridWidth": 4,
+    "gridHeight": 1,
+    "start": { "x": 0, "y": 0 },
+    "startDirection": "east",
+    "target": { "x": 3, "y": 0 }
+  },
+  "starRules": { "threeStar": { "maxBlocks": 3 } },
+  "concepts": ["sequence"],
+  "hints": []
+}

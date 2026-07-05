@@ -5,7 +5,10 @@ import { RobotGridCanvas } from '../engine/RobotGridCanvas';
 import { createInitialState, type RobotState } from '../engine/robotGrid';
 import { runProgram, type ExecutionResult } from '../engine/runner';
 import { getAllLevels } from '../content/manifest';
+import { getWorldMeta } from '../content/worldMeta';
 import { recordLevelCompletion } from '../gamification/store';
+import { ConfettiBurst } from './ConfettiBurst';
+import { XpToast } from './XpToast';
 import type { Level } from '../content/types';
 import type { Profile } from '../storage/localStorage';
 
@@ -33,6 +36,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
   const [completion, setCompletion] = useState<{ xpAwarded: number; stars: 0 | 1 | 2 | 3; newBadges: string[] } | null>(
     null,
   );
+  const [showXpToast, setShowXpToast] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,6 +55,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
     setStepIndex(0);
     setIsPlaying(false);
     setCompletion(null);
+    setShowXpToast(false);
     setMessage(null);
     setRobotState(createInitialState(level.goal));
     blocklyRef.current?.highlightBlock(null);
@@ -87,6 +92,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
         });
         if (outcome) {
           setCompletion({ xpAwarded: outcome.xpAwarded, stars: outcome.stars, newBadges: outcome.newBadges });
+          setShowXpToast(outcome.xpAwarded > 0);
         }
       } else if (execResult.crashed) {
         setMessage(t('levelPlay.crashed'));
@@ -101,6 +107,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
     const execResult = runProgram(code, level.goal);
     setResult(execResult);
     setCompletion(null);
+    setShowXpToast(false);
     setMessage(null);
     setIsPlaying(true);
 
@@ -124,6 +131,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
       execResult = runProgram(code, level.goal);
       setResult(execResult);
       setCompletion(null);
+      setShowXpToast(false);
       setMessage(null);
       setStepIndex(0);
       finishAtStep(execResult, 0);
@@ -152,6 +160,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
   const nextLevel = worldLevels.find((l) => l.order > level.order) ?? null;
 
   const hintKeys = level.hints;
+  const worldMeta = getWorldMeta(level.worldId);
 
   return (
     <div className="level-play">
@@ -174,7 +183,10 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
         </div>
 
         <div className="level-play__scenario">
-          <RobotGridCanvas goal={level.goal} robotState={robotState} />
+          <div className="level-play__canvas-wrap">
+            <RobotGridCanvas goal={level.goal} robotState={robotState} targetGlyph={worldMeta.targetGlyph} />
+            {completion && <ConfettiBurst burstKey={level.id} />}
+          </div>
 
           <div className="level-play__controls">
             <button type="button" className="btn btn-primary" onClick={handleRun} disabled={isPlaying}>
@@ -208,11 +220,22 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
           )}
 
           {completion && (
-            <div className="completion-toast">
-              <p>{'⭐'.repeat(completion.stars)}</p>
-              {completion.xpAwarded > 0 && <p>{t('ui:xpToast', { xp: completion.xpAwarded })}</p>}
+            <div className="level-complete-panel">
+              <p className="level-complete-panel__stars" aria-label={`${completion.stars} stars`}>
+                {Array.from({ length: 3 }, (_, i) => (
+                  <span
+                    key={i}
+                    className={i < completion.stars ? 'star-pop star-pop--earned' : 'star-pop star-pop--empty'}
+                    style={{ ['--star-index' as string]: i }}
+                    aria-hidden="true"
+                  >
+                    {i < completion.stars ? '⭐' : '☆'}
+                  </span>
+                ))}
+              </p>
               {completion.newBadges.map((badgeId) => (
-                <p key={badgeId}>
+                <p key={badgeId} className="level-complete-panel__badge">
+                  {'✓ '}
                   {t('ui:badgeEarnedToast', { badge: t(`ui:badges.${toCamel(badgeId)}`) })}
                 </p>
               ))}
@@ -220,6 +243,13 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
                 {t('levelPlay.nextLevel')}
               </button>
             </div>
+          )}
+
+          {showXpToast && completion && completion.xpAwarded > 0 && (
+            <XpToast
+              message={t('ui:xpToast', { xp: completion.xpAwarded })}
+              onDismiss={() => setShowXpToast(false)}
+            />
           )}
         </div>
       </div>

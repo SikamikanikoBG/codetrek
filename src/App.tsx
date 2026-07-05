@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { ProfilePicker } from './app/ProfilePicker';
 import { WorldMap } from './app/WorldMap';
 import { LevelPlay } from './app/LevelPlay';
+import { ProgressView } from './app/ProgressView';
 import { getStore, getActiveProfile } from './gamification/store';
 import { setActiveLanguage } from './app/i18n';
 import type { Profile } from './storage/localStorage';
 import type { Level } from './content/types';
 import './App.css';
 
-type Screen = 'profile' | 'map' | 'play';
+type Screen = 'profile' | 'map' | 'play' | 'progress';
 
 function App() {
   const [screen, setScreen] = useState<Screen>('profile');
@@ -65,6 +66,11 @@ function App() {
     setScreen('profile');
   }
 
+  function handleShowProgress() {
+    setProfile((current) => refreshProfile(current));
+    setScreen('progress');
+  }
+
   if (screen === 'profile' || !profile) {
     return <ProfilePicker onProfileSelected={handleProfileSelected} />;
   }
@@ -75,7 +81,18 @@ function App() {
     );
   }
 
-  return <WorldMap profile={profile} onSelectLevel={handleSelectLevel} onSwitchProfile={handleSwitchProfile} />;
+  if (screen === 'progress') {
+    return <ProgressView profile={profile} onBack={handleBackToMap} />;
+  }
+
+  return (
+    <WorldMap
+      profile={profile}
+      onSelectLevel={handleSelectLevel}
+      onSwitchProfile={handleSwitchProfile}
+      onShowProgress={handleShowProgress}
+    />
+  );
 }
 
 export default App;

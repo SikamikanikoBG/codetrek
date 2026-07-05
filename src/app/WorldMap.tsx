@@ -9,17 +9,20 @@ interface WorldMapProps {
   profile: Profile;
   onSelectLevel: (level: Level) => void;
   onSwitchProfile: () => void;
+  onShowProgress: () => void;
 }
 
 function LevelTile({
   level,
   status,
   stars,
+  tileIndex,
   onSelectLevel,
 }: {
   level: Level;
   status: 'locked' | 'unlocked' | 'completed';
   stars: 0 | 1 | 2 | 3;
+  tileIndex: number;
   onSelectLevel: (level: Level) => void;
 }) {
   const { t } = useTranslation(['levels', 'ui']);
@@ -30,18 +33,20 @@ function LevelTile({
     <button
       type="button"
       className={`level-tile level-tile--${status}`}
+      style={{ ['--tile-index' as string]: tileIndex }}
       disabled={status === 'locked'}
       onClick={() => onSelectLevel(level)}
       title={t(`ui:levelStatus.${status}`)}
     >
       <span className="level-tile__order">{label}</span>
       {status === 'completed' && (
-        <span className="level-tile__stars" aria-label={`${stars} stars`}>
+        <span className="level-tile__badge level-tile__badge--completed" aria-label={`${stars} stars`}>
+          {'✓ '}
           {'⭐'.repeat(stars)}
         </span>
       )}
       {status === 'locked' && (
-        <span className="level-tile__lock" aria-hidden="true">
+        <span className="level-tile__badge level-tile__badge--locked" aria-hidden="true">
           {'\u{1F512}'}
         </span>
       )}
@@ -49,7 +54,7 @@ function LevelTile({
   );
 }
 
-export function WorldMap({ profile, onSelectLevel, onSwitchProfile }: WorldMapProps) {
+export function WorldMap({ profile, onSelectLevel, onSwitchProfile, onShowProgress }: WorldMapProps) {
   const { t } = useTranslation(['common', 'levels']);
   const allLevels = getAllLevels();
   const statusMap = getLevelStatusMap(profile, allLevels);
@@ -62,23 +67,44 @@ export function WorldMap({ profile, onSelectLevel, onSwitchProfile }: WorldMapPr
           <span>{profile.name}</span>
           <span className="xp-pill">{profile.xp} XP</span>
         </div>
-        <button type="button" className="btn btn-secondary" onClick={onSwitchProfile}>
-          {t('nav.backToProfiles')}
-        </button>
+        <div className="world-map__actions">
+          <button type="button" className="btn btn-secondary" onClick={onShowProgress}>
+            {t('nav.progress')}
+          </button>
+          <button type="button" className="btn btn-secondary" onClick={onSwitchProfile}>
+            {t('nav.backToProfiles')}
+          </button>
+        </div>
       </header>
 
       <h1>{t('nav.worldMapTitle')}</h1>
 
       {worlds.map((world) => (
-        <section key={world.id} className="world-section">
-          <h2>{t(world.titleKey)}</h2>
+        <section
+          key={world.id}
+          className="world-band"
+          style={
+            {
+              '--world-color': `var(${world.colorVar})`,
+              '--world-tint': `var(${world.colorVar}-tint)`,
+              '--world-border': `var(${world.colorVar}-border)`,
+            } as Record<string, string>
+          }
+        >
+          <h2 className="world-band__title">
+            <span className="world-band__icon" aria-hidden="true">
+              {world.icon}
+            </span>
+            {t(world.titleKey)}
+          </h2>
           <div className="level-grid">
-            {world.levels.map((level) => (
+            {world.levels.map((level, index) => (
               <LevelTile
                 key={level.id}
                 level={level}
                 status={statusMap[level.id] ?? 'locked'}
                 stars={profile.progress[level.id]?.stars ?? 0}
+                tileIndex={index}
                 onSelectLevel={onSelectLevel}
               />
             ))}

@@ -14,7 +14,9 @@
   "nav": {
     "backToMap": "Back to Map",
     "backToProfiles": "Switch Profile",
-    "worldMapTitle": "Choose a Level"
+    "worldMapTitle": "Choose a Level",
+    "progress": "Progress",
+    "backToWorldMap": "Back to World Map"
   },
   "levelPlay": {
     "run": "Run",

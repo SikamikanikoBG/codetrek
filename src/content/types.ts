@@ -49,5 +49,9 @@ export interface World {
   id: string;
   order: number;
   titleKey: string;
+  /** CSS custom property carrying this World's identity color, e.g. '--world-robots'. */
+  colorVar: string;
+  /** Single emoji glyph identifying the World in nav/bands — never a mascot illustration. */
+  icon: string;
   levels: Level[];
 }

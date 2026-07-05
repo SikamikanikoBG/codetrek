@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.2.8",
+    "@fontsource/fredoka": "^5.2.10",
     "blockly": "^13.1.0",
     "i18next": "^26.3.4",
     "js-interpreter": "^6.0.2",
@@ -18,6 +20,7 @@
     "react-i18next": "^17.0.8"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^24.13.2",

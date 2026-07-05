@@ -1,41 +1,61 @@
-/* CodeTrek app shell — flexbox/grid throughout, no fixed-pixel-only
-   layouts, touch-friendly tap targets (Blockly has its own touch support
-   built in; this just keeps buttons/tiles large enough for small fingers). */
+/* CodeTrek app shell — implements DESIGN.md's Layout/Components/Motion specs
+   on top of the OKLCH tokens in index.css. Flexbox for linear flows, CSS
+   Grid for the World map / level grids / Progress stat grids. No nested
+   cards, no side-stripe borders, no gradient text (see DESIGN.md
+   "Anti-patterns to avoid"). Touch-friendly 44px minimum tap targets
+   throughout — Blockly ships its own touch support. */
 
-.btn,
-.lang-btn,
-.avatar-choice,
-.profile-card,
-.level-tile {
-  font: inherit;
-  cursor: pointer;
-  border: 2px solid var(--border);
-  background: var(--bg);
-  color: var(--text-h);
-  border-radius: 10px;
-  min-height: 44px;
-  min-width: 44px;
-  touch-action: manipulation;
-}
+/* ---------- Buttons ---------- */
 
 .btn {
-  padding: 10px 18px;
-  font-size: 16px;
+  font: inherit;
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 12px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: 2px solid transparent;
+  background: var(--surface);
+  color: var(--ink);
+  touch-action: manipulation;
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out, background 150ms ease-out;
 }
 
-.btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
-.btn-secondary {
-  background: transparent;
+.btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+
+.btn-accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink);
 }
 
 /* ---------- Profile picker ---------- */
@@ -60,6 +80,28 @@
   justify-content: center;
 }
 
+.profile-card,
+.avatar-choice,
+.lang-btn {
+  font: inherit;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--ink);
+  border-radius: 14px;
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  transition: transform 150ms ease-out, border-color 150ms ease-out;
+}
+
+.profile-card:hover,
+.avatar-choice:hover,
+.lang-btn:hover {
+  transform: translateY(-1px);
+}
+
 .profile-card {
   display: flex;
   flex-direction: column;
@@ -70,7 +112,7 @@
 }
 
 .profile-card__avatar {
-  font-size: 40px;
+  font-size: 2.25rem;
 }
 
 .profile-picker__create {
@@ -82,15 +124,18 @@
 
 .profile-picker__create input {
   font: inherit;
+  font-family: var(--font-body);
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 2px solid var(--border);
   min-height: 44px;
+  background: var(--surface-raised);
+  color: var(--ink);
 }
 
 .flabel {
   margin: 8px 0 0;
-  font-weight: 600;
+  font-weight: 700;
   text-align: left;
 }
 
@@ -101,13 +146,13 @@
 }
 
 .avatar-choice {
-  font-size: 28px;
+  font-size: 1.75rem;
   aspect-ratio: 1;
 }
 
 .avatar-choice--selected {
-  border-color: var(--accent);
-  background: var(--accent-bg);
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary) 14%, var(--surface-raised));
 }
 
 .language-choice {
@@ -121,12 +166,13 @@
 }
 
 .lang-btn--selected {
-  border-color: var(--accent);
-  background: var(--accent-bg);
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary) 14%, var(--surface-raised));
 }
 
 .profile-picker__error {
-  color: #e0483e;
+  color: var(--danger);
+  font-weight: 700;
 }
 
 /* ---------- World map ---------- */
@@ -134,7 +180,7 @@
 .world-map {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   padding: 16px;
   width: 100%;
   box-sizing: border-box;
@@ -154,48 +200,122 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 20px;
+  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.world-map__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .xp-pill {
-  font-size: 14px;
-  background: var(--accent-bg);
-  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--accent-ink);
   border-radius: 999px;
-  padding: 4px 10px;
+  padding: 4px 12px;
+}
+
+/* Full-bleed tinted World band — a domain "chapter", not a card-in-a-card. */
+.world-band {
+  border-radius: 24px;
+  padding: 20px 20px 24px;
+  /* Explicit per-world -tint/-border tokens (index.css), not runtime
+     color-mix() — color-mix(in oklch, hue N%, pure-achromatic --bg)
+     collapses hue toward an implementation-default in at least one
+     tested engine (every world rendered the same washed pink). Hand
+     picked tokens keep each World's identity hue faithful. */
+  background: var(--world-tint, var(--surface));
+  border: 1px solid var(--world-border, var(--border));
+}
+
+.world-band__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.world-band__icon {
+  font-size: 1.75rem;
+  line-height: 1;
 }
 
 .level-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 12px;
 }
 
 .level-tile {
+  font: inherit;
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
   aspect-ratio: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  font-size: 18px;
+  gap: 6px;
+  font-size: 1.125rem;
+  border-radius: 16px;
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  border: 2px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--ink);
+  /* Level-unlock motion: scale+fade in, staggered per tile (DESIGN.md Motion). */
+  animation: tile-in 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--tile-index, 0) * 40ms);
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
 }
 
-.level-tile--completed {
-  border-color: #33a852;
-  background: rgba(51, 168, 82, 0.1);
+.level-tile:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .level-tile--unlocked {
-  border-color: var(--accent);
+  border-color: var(--world-color, var(--primary));
+}
+
+.level-tile--completed {
+  border-color: var(--success);
+  background: color-mix(in oklch, var(--success) 12%, var(--surface-raised));
 }
 
 .level-tile--locked {
-  opacity: 0.5;
+  color: var(--muted);
+  cursor: not-allowed;
 }
 
-.level-tile__stars {
-  font-size: 12px;
+.level-tile__badge {
+  font-size: 0.75rem;
+}
+
+.level-tile__badge--completed {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.level-tile__badge--locked {
+  font-size: 1rem;
+}
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ---------- Level play ---------- */
@@ -230,11 +350,15 @@
   }
 }
 
+/* Blockly chrome: Blockly's own canvas/toolbox stays functionally untouched,
+   framed in a surface-raised panel (DESIGN.md "Blockly chrome"). */
 .level-play__editor {
   min-height: 420px;
+  background: var(--surface-raised);
   border: 2px solid var(--border);
-  border-radius: 10px;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .blockly-editor {
@@ -247,13 +371,27 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
+}
+
+.level-play__canvas-wrap {
+  position: relative;
+}
+
+.confetti-burst {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .robot-grid-canvas {
   width: 100%;
   max-height: 60vh;
-  background: var(--code-bg);
-  border-radius: 10px;
+  background: var(--surface);
+  border-radius: 16px;
   border: 2px solid var(--border);
 }
 
@@ -264,13 +402,13 @@
 }
 
 .grid-cell--obstacle {
-  fill: #e0483e;
-  opacity: 0.35;
+  fill: var(--danger);
+  opacity: 0.3;
 }
 
 .grid-cell--target {
-  fill: #33a852;
-  opacity: 0.2;
+  fill: var(--success);
+  opacity: 0.18;
 }
 
 .grid-flag {
@@ -294,8 +432,8 @@
 }
 
 .level-play__message {
-  font-weight: 600;
-  color: #e0483e;
+  font-weight: 700;
+  color: var(--danger);
 }
 
 .level-play__hints ul {
@@ -305,22 +443,360 @@
 }
 
 .level-play__code {
-  background: var(--code-bg);
-  border-radius: 10px;
+  background: var(--surface);
+  border-radius: 12px;
   padding: 12px;
   overflow-x: auto;
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: left;
 }
 
-.completion-toast {
-  border: 2px solid #33a852;
-  background: rgba(51, 168, 82, 0.1);
-  border-radius: 10px;
-  padding: 16px;
+/* Level-complete panel: persistent celebration card (stars + badges + next
+   level CTA). Confetti (canvas, over the scenario) and the XP toast
+   (auto-dismissing) are separate, transient motion layered alongside it. */
+.level-complete-panel {
+  border: 1px solid var(--success);
+  background: color-mix(in oklch, var(--success) 12%, var(--surface-raised));
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.level-complete-panel__stars {
+  font-size: 1.75rem;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+}
+
+.level-complete-panel__badge {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Star earn: each star pops in sequence, ease-out-quart, two-step scale
+   (0.8 -> 1.05 -> 1.0) rather than a spring/bounce curve. */
+.star-pop--earned {
+  display: inline-block;
+  animation: star-pop 320ms cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: calc(var(--star-index, 0) * 160ms);
+}
+
+.star-pop--empty {
+  display: inline-block;
+  opacity: 0.35;
+}
+
+@keyframes star-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* XP toast: slides up from the bottom on mobile, in from the side on
+   desktop; auto-dismisses with a progress-bar wipe. */
+.xp-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  background: var(--surface-raised);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  padding: 12px 18px;
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 200px;
+  animation: xp-toast-in-bottom 300ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@media (min-width: 800px) {
+  .xp-toast {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    transform: none;
+    animation-name: xp-toast-in-side;
+  }
+}
+
+@keyframes xp-toast-in-bottom {
+  from {
+    transform: translate(-50%, 120%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes xp-toast-in-side {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.xp-toast__message {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.xp-toast__bar-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.xp-toast__bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  animation-name: xp-toast-wipe;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes xp-toast-wipe {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------- Progress view ---------- */
+
+.progress-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.progress-view__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.progress-view__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.progress-panel {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.progress-panel--rank {
+  background: color-mix(in oklch, var(--accent) 10%, var(--surface));
+  border: 1px solid color-mix(in oklch, var(--accent) 30%, var(--border));
+}
+
+.progress-rank__xp {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.progress-rank__label {
+  display: inline-block;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin: 8px 0 14px;
+}
+
+.progress-rank__next {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-top: 8px;
+}
+
+.progress-rank__next--top {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.progress-bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: var(--primary);
+  border-radius: inherit;
+  transition: width 350ms ease-out;
+}
+
+.progress-empty {
+  color: var(--muted);
+}
+
+.badge-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.badge-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border-radius: 16px;
+  text-align: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+}
+
+.badge-tile--earned {
+  border-color: var(--success);
+}
+
+.badge-tile__icon {
+  font-size: 2rem;
+}
+
+.badge-tile--locked .badge-tile__icon {
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+
+.badge-tile__status {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 0.875rem;
+}
+
+.badge-tile__status--earned {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.badge-tile__status--locked {
+  opacity: 0.7;
+}
+
+.badge-tile__desc {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.world-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.world-progress-row {
+  display: flex;
+  gap: 12px;
   align-items: flex-start;
+}
+
+.world-progress-row .progress-bar__fill {
+  background: var(--row-color, var(--primary));
+}
+
+.world-progress-row__icon {
+  font-size: 1.75rem;
+  line-height: 1.4;
+}
+
+.world-progress-row__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.world-progress-row__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.world-progress-row__stats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.recent-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.recent-activity-item__level {
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+
+.recent-activity-item__date {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.8125rem;
 }

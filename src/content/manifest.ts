@@ -1,4 +1,5 @@
 import type { Level, World } from './types';
+import { getWorldMeta } from './worldMeta';
 
 // Eagerly load every hand-authored level JSON file at build time.
 // Path shape: ./worlds/<world-id>/<level-id>.json
@@ -17,12 +18,17 @@ for (const path in levelModules) {
 }
 
 export const worlds: World[] = Array.from(levelsByWorld.entries())
-  .map(([worldId, levels], index) => ({
-    id: worldId,
-    order: index,
-    titleKey: `levels:worlds.${worldId}.title`,
-    levels: [...levels].sort((a, b) => a.order - b.order),
-  }))
+  .map(([worldId, levels]) => {
+    const meta = getWorldMeta(worldId);
+    return {
+      id: worldId,
+      order: meta.order,
+      titleKey: `levels:worlds.${worldId}.title`,
+      colorVar: meta.colorVar,
+      icon: meta.icon,
+      levels: [...levels].sort((a, b) => a.order - b.order),
+    };
+  })
   .sort((a, b) => a.order - b.order);
 
 export function getWorld(worldId: string): World | undefined {

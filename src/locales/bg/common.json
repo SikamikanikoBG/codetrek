@@ -14,7 +14,9 @@
   "nav": {
     "backToMap": "Назад към картата",
     "backToProfiles": "Смени профила",
-    "worldMapTitle": "Избери ниво"
+    "worldMapTitle": "Избери ниво",
+    "progress": "Напредък",
+    "backToWorldMap": "Назад към картата на света"
   },
   "levelPlay": {
     "run": "Пусни",

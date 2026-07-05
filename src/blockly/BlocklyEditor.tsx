@@ -20,6 +20,30 @@ const TOOLBOXES: Record<ToolboxRef, Blockly.utils.toolbox.ToolboxDefinition> = {
   'block-text': blockTextToolbox as unknown as Blockly.utils.toolbox.ToolboxDefinition,
 };
 
+// DESIGN.md "Blockly chrome": keep Blockly's own canvas/toolbox rendering
+// untouched functionally — frame it, don't fight it. Component-level colors
+// (workspace/toolbox/flyout background, insertion marker, scrollbar) are set
+// via CSS custom properties so the frame stays in sync with the app's
+// light/dark theme automatically; block category colours are left as-is
+// (Blockly's own Scratch-like category color-coding for Move/Loops/Logic/
+// Variables/Functions).
+const CODETREK_BLOCKLY_THEME = Blockly.Theme.defineTheme('codetrek', {
+  name: 'codetrek',
+  base: Blockly.Themes.Classic,
+  componentStyles: {
+    workspaceBackgroundColour: 'var(--surface)',
+    toolboxBackgroundColour: 'var(--surface-raised)',
+    toolboxForegroundColour: 'var(--ink)',
+    flyoutBackgroundColour: 'var(--surface-raised)',
+    flyoutForegroundColour: 'var(--ink)',
+    flyoutOpacity: 1,
+    scrollbarColour: 'var(--border)',
+    insertionMarkerColour: 'var(--primary)',
+    insertionMarkerOpacity: 0.4,
+    cursorColour: 'var(--accent)',
+  },
+});
+
 export interface BlocklyEditorHandle {
   getJavaScriptCode: () => string;
   getPythonCode: () => string;
@@ -53,9 +77,10 @@ export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>
     const workspace = Blockly.inject(container, {
       toolbox: TOOLBOXES[toolboxRef],
       trashcan: true,
+      theme: CODETREK_BLOCKLY_THEME,
       zoom: { controls: true, wheel: true, startScale: 1 },
       move: { scrollbars: true, drag: true, wheel: true },
-      grid: { spacing: 24, length: 2, colour: '#3a3f4b', snap: true },
+      grid: { spacing: 24, length: 2, colour: 'var(--border)', snap: true },
     });
     workspaceRef.current = workspace;
 

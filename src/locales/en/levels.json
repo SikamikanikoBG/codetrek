@@ -1,6 +1,7 @@
 {
   "worlds": {
-    "world-1": { "title": "World 1: The Grid" }
+    "world-1": { "title": "Robots" },
+    "world-2": { "title": "AI Lab" }
   },
   "w1-l05": {
     "title": "Loop It!",
@@ -41,5 +42,35 @@
     "title": "The Final Trek",
     "hint1": "Use everything you've learned: loops, if-checks, and variables.",
     "hint2": "Plan your route in sections before you start placing blocks."
+  },
+  "w2-l04": {
+    "title": "Scan the Row",
+    "hint1": "The helper AI needs to check every cell in a straight line.",
+    "hint2": "A 'repeat' block with 'move forward' inside scans the whole row."
+  },
+  "w2-l05": {
+    "title": "Sweep the Lab",
+    "hint1": "Combine turning and moving inside your repeat block to sweep the room.",
+    "hint2": "Think about how many times the pattern needs to repeat."
+  },
+  "w2-l06": {
+    "title": "Set the Scan Count",
+    "hint1": "A variable can hold how many data points to scan.",
+    "hint2": "Set the variable once, then use it inside your repeat block."
+  },
+  "w2-l07": {
+    "title": "Sensor Check",
+    "hint1": "Use 'path ahead clear?' inside an if-block before moving.",
+    "hint2": "If a reading is blocked, turn and go around it."
+  },
+  "w2-l08": {
+    "title": "Sort the Pile",
+    "hint1": "Combine a repeat block with an if-block to handle each item.",
+    "hint2": "Check the sensor before every move forward."
+  },
+  "w2-l09": {
+    "title": "The Big Dataset",
+    "hint1": "Use everything you've learned: loops, sensor checks, and variables.",
+    "hint2": "Plan your scan path in sections before placing blocks."
   }
 }

@@ -14,7 +14,30 @@
     "conditionalThinker": "Conditional Thinker — complete a level using an if-block",
     "variableWizard": "Variable Wizard — complete a level using a variable",
     "perfectionist": "Perfectionist — earn 3 stars on 5 levels",
-    "world1Complete": "World 1 Complete — finish every level in World 1"
+    "world1Complete": "Robots Complete — finish every level in the Robots world",
+    "world2Complete": "AI Lab Complete — finish every level in the AI Lab world"
+  },
+  "ranks": {
+    "newRecruit": "New Recruit",
+    "apprenticeCoder": "Apprentice Coder",
+    "gridStrategist": "Grid Strategist",
+    "aiWhisperer": "AI Whisperer",
+    "codeMaster": "Code Master"
+  },
+  "progress": {
+    "title": "Your Progress",
+    "totalXp": "{{xp}} XP",
+    "rank": "Rank",
+    "nextRank": "{{xp}} XP to next rank",
+    "topRank": "Top rank reached!",
+    "badges": "Badges",
+    "badgeLocked": "Not yet earned",
+    "worldProgress": "Worlds",
+    "levelsCompleted": "{{completed}}/{{total}} levels",
+    "starsCollected": "{{stars}}/{{max}} stars",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No levels completed yet — go earn your first star!",
+    "completedOn": "Completed {{date}}"
   },
   "dailyChallengeNote": "Daily Challenge remixes levels you've already learned with new numbers — it's practice, not new lessons."
 }

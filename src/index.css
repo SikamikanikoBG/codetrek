@@ -1,52 +1,98 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+/* CodeTrek design tokens — see DESIGN.md "Core tokens (OKLCH)" (authoritative,
+   implemented verbatim) and "Typography". Self-hosted Fredoka (display) +
+   Atkinson Hyperlegible (body/UI) via @fontsource, imported in main.tsx. */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+:root {
+  /* Base surface (light) */
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.96 0.012 145);
+  --surface-raised: oklch(0.99 0.006 145);
+  --ink: oklch(0.22 0.02 145);
+  --muted: oklch(0.48 0.02 145);
+  --border: oklch(0.88 0.02 145);
+
+  /* Brand */
+  --primary: oklch(0.62 0.16 145);
+  --primary-ink: oklch(1 0 0);
+  --accent: oklch(0.72 0.19 55);
+  --accent-ink: oklch(0.18 0.02 55);
+
+  /* Status — always paired with icon/shape, never color-alone */
+  --success: oklch(0.60 0.15 150);
+  --danger: oklch(0.58 0.19 25);
+  --locked: oklch(0.70 0.01 145);
+
+  /* World/domain identity colors — one per World, L 0.55-0.65 / C 0.15-0.19.
+     Explicit pre-mixed -tint/-border pairs (not runtime color-mix against
+     --bg) because color-mix(in oklch, hue N%, pure-achromatic-white)
+     collapses hue toward an implementation-default (observed: both worlds
+     rendering the same washed pink) in at least one tested engine — hand
+     picking the light tint/border keeps each World's hue faithful. */
+  --world-robots: oklch(0.58 0.16 250); /* blue */
+  --world-robots-tint: oklch(0.93 0.03 250);
+  --world-robots-border: oklch(0.72 0.09 250);
+  --world-ai: oklch(0.58 0.18 300); /* violet */
+  --world-ai-tint: oklch(0.93 0.035 300);
+  --world-ai-border: oklch(0.72 0.10 300);
+
+  --shadow-sm: 0 2px 4px oklch(0.22 0.02 145 / 0.08);
+  --shadow-md: 0 6px 16px oklch(0.22 0.02 145 / 0.12);
+
+  /* z-index scale (DESIGN.md Layout) */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+
+  --font-display: 'Fredoka', system-ui, sans-serif;
+  --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  font: 1.0625rem/1.5 var(--font-body);
   color-scheme: light dark;
-  color: var(--text);
+  color: var(--ink);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+:root[data-theme='dark'] {
+  --bg: oklch(0.09 0 0);
+  --surface: oklch(0.15 0.015 145);
+  --surface-raised: oklch(0.19 0.015 145);
+  --ink: oklch(0.95 0.01 145);
+  --muted: oklch(0.72 0.02 145);
+  --border: oklch(0.30 0.02 145);
+  --primary: oklch(0.68 0.16 145);
+  --primary-ink: oklch(0.09 0 0);
+  --accent: oklch(0.76 0.18 55);
+  --accent-ink: oklch(0.12 0.02 55);
+  --world-robots-tint: oklch(0.24 0.05 250);
+  --world-robots-border: oklch(0.55 0.13 250);
+  --world-ai-tint: oklch(0.24 0.055 300);
+  --world-ai-border: oklch(0.55 0.14 300);
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+/* prefers-color-scheme applies unless an explicit data-theme overrides it */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: oklch(0.09 0 0);
+    --surface: oklch(0.15 0.015 145);
+    --surface-raised: oklch(0.19 0.015 145);
+    --ink: oklch(0.95 0.01 145);
+    --muted: oklch(0.72 0.02 145);
+    --border: oklch(0.30 0.02 145);
+    --primary: oklch(0.68 0.16 145);
+    --primary-ink: oklch(0.09 0 0);
+    --accent: oklch(0.76 0.18 55);
+    --accent-ink: oklch(0.12 0.02 55);
+    --world-robots-tint: oklch(0.24 0.05 250);
+    --world-robots-border: oklch(0.55 0.13 250);
+    --world-ai-tint: oklch(0.24 0.055 300);
+    --world-ai-border: oklch(0.55 0.14 300);
   }
 }
 
@@ -58,6 +104,7 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  background: var(--bg);
 }
 
 body {
@@ -65,30 +112,29 @@ body {
 }
 
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+  margin: 0 0 8px;
 }
 
+/* Display scale reserved for hero moments only (world map title) */
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 16px 0;
 }
+
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+  font-size: 1.5rem;
+  line-height: 1.2;
 }
+
 p {
   margin: 0;
 }
@@ -98,12 +144,30 @@ code,
   font-family: var(--mono);
   display: inline-flex;
   border-radius: 4px;
-  color: var(--text-h);
+  color: var(--ink);
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
+  font-size: 0.9375rem;
+  line-height: 1.35;
   padding: 4px 8px;
-  background: var(--code-bg);
+  background: var(--surface);
+}
+
+/* Global reduced-motion fallback: every animation/transition in the app
+   collapses to (near-)instant rather than being removed outright, so end
+   states still apply and onAnimationEnd/onTransitionEnd handlers still fire.
+   Feature-specific crossfade fallbacks (confetti, etc.) are layered on top
+   of this where a feature needs more than "instant". */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
 }
