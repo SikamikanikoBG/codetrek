@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# codetrek-api local dev DB (server/src/db.ts defaults DB_PATH here)
+server/data
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

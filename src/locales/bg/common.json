@@ -9,7 +9,14 @@
     "startPlaying": "Започни играта",
     "languageLabel": "Език",
     "maxProfilesReached": "Достигнат е максимумът от 4 профила.",
-    "nameRequired": "Моля, въведи име."
+    "nameRequired": "Моля, въведи име.",
+    "linkDevice": "Имаш код за синхронизация от друго устройство?",
+    "linkCodeLabel": "Въведи кода",
+    "linkCodePlaceholder": "напр. 7G2BBQ",
+    "linkButton": "Свържи това устройство",
+    "linking": "Свързване…",
+    "linkCodeRequired": "Моля, въведи код.",
+    "linkError": "Кодът не проработи — провери го и опитай пак."
   },
   "nav": {
     "backToMap": "Назад към картата",

@@ -28,6 +28,31 @@ jobs:
       - name: Run unit tests
         run: npx vitest run
 
+  server-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Build (typecheck)
+        working-directory: server
+        run: npm run build
+
+      - name: Run unit tests
+        working-directory: server
+        run: npm test
+
   docker-smoke-test:
     runs-on: ubuntu-latest
     needs: build-test
@@ -58,3 +83,34 @@ jobs:
       - name: Clean up
         if: always()
         run: docker rm -f codetrek-ci || true
+
+  docker-smoke-test-api:
+    runs-on: ubuntu-latest
+    needs: server-build-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t codetrek-api:ci ./server
+
+      - name: Boot container
+        run: docker run -d --name codetrek-api-ci -p 8091:4000 -e DB_PATH=/data/codetrek.sqlite codetrek-api:ci
+
+      - name: Wait for health check (curl loop)
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8091/api/health >/dev/null; then
+              echo "API is up."
+              exit 0
+            fi
+            echo "Waiting for API to respond ($i)..."
+            sleep 2
+          done
+          echo "API did not become healthy in time."
+          docker logs codetrek-api-ci
+          exit 1
+
+      - name: Clean up
+        if: always()
+        run: docker rm -f codetrek-api-ci || true

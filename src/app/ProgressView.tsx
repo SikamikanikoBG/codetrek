@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { worlds, getAllLevels } from '../content/manifest';
 import { BADGE_RULES, getRank, getWorldCompletion, getRecentActivity } from '../gamification/rules';
 import type { Profile } from '../storage/localStorage';
+import { SyncPanel } from './SyncPanel';
 
 interface ProgressViewProps {
   profile: Profile;
@@ -160,6 +161,8 @@ export function ProgressView({ profile, onBack }: ProgressViewProps) {
           </ul>
         )}
       </section>
+
+      <SyncPanel profile={profile} />
     </div>
   );
 }

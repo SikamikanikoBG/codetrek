@@ -6,6 +6,7 @@ import { readStore, writeStore, type ProfileStoreV1, type Profile } from '../sto
 import { calculateXp, evaluateNewBadges, computeLevelStatus } from './rules';
 import type { Level, StarRules } from '../content/types';
 import { calculateStars } from '../engine/robotGrid';
+import { notifyProfileChanged } from '../sync/hooks';
 
 function generateId(): string {
   return `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -51,6 +52,7 @@ export function updateLanguagePref(profileId: string, languagePref: 'en' | 'bg')
   if (profile) {
     profile.languagePref = languagePref;
     writeStore(store);
+    notifyProfileChanged(profile);
   }
 }
 
@@ -104,6 +106,7 @@ export function recordLevelCompletion(
   profile.badges.push(...newBadges);
 
   writeStore(store);
+  notifyProfileChanged(profile);
   return { profile, xpAwarded, stars: bestStars, newBadges };
 }
 

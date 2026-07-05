@@ -39,5 +39,16 @@
     "noActivity": "No levels completed yet — go earn your first star!",
     "completedOn": "Completed {{date}}"
   },
-  "dailyChallengeNote": "Daily Challenge remixes levels you've already learned with new numbers — it's practice, not new lessons."
+  "dailyChallengeNote": "Daily Challenge remixes levels you've already learned with new numbers — it's practice, not new lessons.",
+  "sync": {
+    "title": "Play on Another Device",
+    "desc": "Turn this on to get a code you can type into a phone or tablet — it brings this profile's progress along.",
+    "enable": "Get My Sync Code",
+    "enabling": "Getting your code…",
+    "linked": "Synced! This profile can play on other devices.",
+    "codeAria": "Your sync code",
+    "codeHint": "Type this code into \"Link a device\" on the other device.",
+    "getNewCode": "Show a New Code",
+    "error": "Couldn't reach the sync server — try again in a bit."
+  }
 }

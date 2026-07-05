@@ -12,3 +12,27 @@ services:
     # No bundled Watchtower service here — ardi already runs one shared,
     # label-scoped Watchtower instance (--label-enable --cleanup --interval 60)
     # that picks up any service carrying the enable label above.
+    depends_on:
+      - codetrek-api
+
+  # Small backend for optional cross-device profile sync (issue #1). Not
+  # published on a host port — nginx (the `codetrek` service above) reverse
+  # proxies /api/ to it over the compose-internal network (deploy/nginx.conf),
+  # so it's reachable only from inside this compose network, same "no
+  # exposure beyond the LAN/tailnet" spirit as the rest of the app.
+  codetrek-api:
+    image: sikamikaniko123/codetrek-api:latest
+    container_name: codetrek-api
+    restart: unless-stopped
+    environment:
+      DB_PATH: /data/codetrek.sqlite
+      PORT: "4000"
+    volumes:
+      # Named volume so the SQLite file survives container recreation —
+      # Watchtower recreates this container on every image update.
+      - codetrek-api-data:/data
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+
+volumes:
+  codetrek-api-data:

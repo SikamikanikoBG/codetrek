@@ -1,0 +1,29 @@
+{
+  "name": "codetrek-api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Small Express + SQLite backend for optional CodeTrek cross-device profile sync (github.com/SikamikanikoBG/codetrek issue #1). No accounts/passwords — link-code + per-device-token model only.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.7",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vite": "^6.4.3",
+    "vitest": "^4.1.9"
+  }
+}
