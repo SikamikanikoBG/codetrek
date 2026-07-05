@@ -19,5 +19,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
+    // server/ is its own workspace with its own package.json, vitest config,
+    // and CI job (server-build-test) — without this exclude, the root
+    // `vitest run` picks up server/src/*.test.ts too and fails to resolve
+    // its dependencies (e.g. supertest) unless server/node_modules happens
+    // to already exist on disk, which is exactly what masked this locally.
+    exclude: ['**/node_modules/**', 'server/**'],
   },
 })
