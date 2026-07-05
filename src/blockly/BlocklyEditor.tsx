@@ -27,22 +27,70 @@ const TOOLBOXES: Record<ToolboxRef, Blockly.utils.toolbox.ToolboxDefinition> = {
 // light/dark theme automatically; block category colours are left as-is
 // (Blockly's own Scratch-like category color-coding for Move/Loops/Logic/
 // Variables/Functions).
-const CODETREK_BLOCKLY_THEME = Blockly.Theme.defineTheme('codetrek', {
-  name: 'codetrek',
-  base: Blockly.Themes.Classic,
-  componentStyles: {
-    workspaceBackgroundColour: 'var(--surface)',
-    toolboxBackgroundColour: 'var(--surface-raised)',
-    toolboxForegroundColour: 'var(--ink)',
-    flyoutBackgroundColour: 'var(--surface-raised)',
-    flyoutForegroundColour: 'var(--ink)',
-    flyoutOpacity: 1,
-    scrollbarColour: 'var(--border)',
-    insertionMarkerColour: 'var(--primary)',
-    insertionMarkerOpacity: 0.4,
-    cursorColour: 'var(--accent)',
-  },
-});
+//
+// IMPORTANT: Blockly's theme/componentStyles values are NOT run through the
+// browser's CSS cascade — Blockly parses them itself (e.g. to derive border/
+// shadow shades and validate the insertion-marker colour) using its own
+// legacy colour parser, which understands hex/rgb/hsl/named colors but NOT
+// CSS custom-property references OR modern oklch()/oklab() syntax (both of
+// which this design system's tokens use). Feeding it either throws
+// `Invalid colour: "..."`, and that exception firing mid-render/mid-drag was
+// the actual cause of the v0.2 "unreliable drag, ghost blocks that can't be
+// clicked or removed, workspace secretly containing far more blocks than
+// visible" bug. Fix: resolve the CSS var, then normalize via a Canvas 2D
+// pixel readback — modern Chromium's `ctx.fillStyle` getter now round-trips
+// oklch() as oklch() (no longer downgrades to rgb, so that trick alone
+// doesn't work), but actually rasterizing a pixel and reading its RGBA
+// channel values back always yields plain 0-255 integers, which is exactly
+// what Blockly's legacy colour parser expects.
+let normalizeCanvas: HTMLCanvasElement | null = null;
+// Exported for regression testing only — Blockly's colour parser silently
+// corrupting drag state on an unparseable theme colour is exactly the kind
+// of failure that must never silently reappear.
+export function cssColorToRgb(cssColor: string): string | null {
+  if (typeof document === 'undefined') return null;
+  if (!normalizeCanvas) {
+    normalizeCanvas = document.createElement('canvas');
+    normalizeCanvas.width = 1;
+    normalizeCanvas.height = 1;
+  }
+  const ctx = normalizeCanvas.getContext('2d');
+  if (!ctx) return null;
+  try {
+    ctx.fillStyle = cssColor;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return `rgb(${r}, ${g}, ${b})`;
+  } catch {
+    return null;
+  }
+}
+
+export function readColorToken(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  if (!raw) return fallback;
+  return cssColorToRgb(raw) ?? fallback;
+}
+
+function buildCodetrekBlocklyTheme(): Blockly.Theme {
+  return Blockly.Theme.defineTheme('codetrek', {
+    name: 'codetrek',
+    base: Blockly.Themes.Classic,
+    componentStyles: {
+      workspaceBackgroundColour: readColorToken('--surface', '#eef1ec'),
+      toolboxBackgroundColour: readColorToken('--surface-raised', '#ffffff'),
+      toolboxForegroundColour: readColorToken('--ink', '#1a2419'),
+      flyoutBackgroundColour: readColorToken('--surface-raised', '#ffffff'),
+      flyoutForegroundColour: readColorToken('--ink', '#1a2419'),
+      flyoutOpacity: 1,
+      scrollbarColour: readColorToken('--border', '#d7ddd3'),
+      insertionMarkerColour: readColorToken('--primary', '#4a9a5f'),
+      insertionMarkerOpacity: 0.4,
+      cursorColour: readColorToken('--accent', '#e0a030'),
+    },
+  });
+}
 
 export interface BlocklyEditorHandle {
   getJavaScriptCode: () => string;
@@ -77,12 +125,21 @@ export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>
     const workspace = Blockly.inject(container, {
       toolbox: TOOLBOXES[toolboxRef],
       trashcan: true,
-      theme: CODETREK_BLOCKLY_THEME,
+      theme: buildCodetrekBlocklyTheme(),
       zoom: { controls: true, wheel: true, startScale: 1 },
       move: { scrollbars: true, drag: true, wheel: true },
-      grid: { spacing: 24, length: 2, colour: 'var(--border)', snap: true },
+      grid: { spacing: 24, length: 2, colour: readColorToken('--border', '#d7ddd3'), snap: true },
     });
     workspaceRef.current = workspace;
+
+    // Re-resolve and re-apply the theme when the OS light/dark preference
+    // flips, since the colors above are resolved once at inject time (they
+    // can't be live CSS var() references — see buildCodetrekBlocklyTheme).
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleColorSchemeChange = () => {
+      workspace.setTheme(buildCodetrekBlocklyTheme());
+    };
+    darkModeQuery.addEventListener('change', handleColorSchemeChange);
 
     const initial = startingWorkspaceRef.current;
     if (initial) {
@@ -95,6 +152,7 @@ export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>
     }
 
     return () => {
+      darkModeQuery.removeEventListener('change', handleColorSchemeChange);
       workspace.dispose();
       if (workspaceRef.current === workspace) workspaceRef.current = null;
     };
