@@ -1,0 +1,45 @@
+{
+  "worlds": {
+    "world-1": { "title": "World 1: The Grid" }
+  },
+  "w1-l05": {
+    "title": "Loop It!",
+    "hint1": "Doing the same move again and again? There's a block for that.",
+    "hint2": "Try a 'repeat' block with 'move forward' inside it."
+  },
+  "w1-l06": {
+    "title": "Turn and Go",
+    "hint1": "Combine turning and moving inside your repeat block.",
+    "hint2": "Think about how many times you need to repeat the pattern."
+  },
+  "w1-l07": {
+    "title": "Name Your Number",
+    "hint1": "A variable can hold how far to go.",
+    "hint2": "Set a variable, then use it inside your repeat block."
+  },
+  "w1-l08": {
+    "title": "Is It Clear?",
+    "hint1": "Use 'path ahead clear?' inside an if-block to check before you move.",
+    "hint2": "If the path isn't clear, try turning instead."
+  },
+  "w1-l09": {
+    "title": "Loops and Choices",
+    "hint1": "Combine a repeat block with an if-block.",
+    "hint2": "Check if the path is clear before moving forward each time."
+  },
+  "w1-l10": {
+    "title": "Long Way Home",
+    "hint1": "A bigger variable means a longer trip — no extra blocks needed.",
+    "hint2": "Set your variable once, then reuse it."
+  },
+  "w1-l11": {
+    "title": "Obstacle Course",
+    "hint1": "Break the course into short repeat-and-check segments.",
+    "hint2": "Turn only when the path ahead isn't clear."
+  },
+  "w1-l12": {
+    "title": "The Final Trek",
+    "hint1": "Use everything you've learned: loops, if-checks, and variables.",
+    "hint2": "Plan your route in sections before you start placing blocks."
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "w1-l09",
+  "worldId": "world-1",
+  "order": 9,
+  "tier": "block-text",
+  "scenario": "robot-grid",
+  "titleKey": "levels:w1-l09.title",
+  "toolboxRef": "block-text",
+  "goal": {
+    "gridWidth": 6,
+    "gridHeight": 6,
+    "start": { "x": 0, "y": 0 },
+    "startDirection": "east",
+    "target": { "x": 5, "y": 5 },
+    "obstacles": [{ "x": 3, "y": 0 }, { "x": 3, "y": 1 }, { "x": 3, "y": 2 }]
+  },
+  "starRules": { "threeStar": { "maxBlocks": 8 } },
+  "concepts": ["loop", "conditional"],
+  "hints": ["levels:w1-l09.hint1", "levels:w1-l09.hint2"]
+}

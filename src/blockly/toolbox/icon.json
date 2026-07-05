@@ -1,0 +1,8 @@
+{
+  "kind": "flyoutToolbox",
+  "contents": [
+    { "kind": "block", "type": "move_forward_icon" },
+    { "kind": "block", "type": "turn_left_icon" },
+    { "kind": "block", "type": "turn_right_icon" }
+  ]
+}

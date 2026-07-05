@@ -1,0 +1,15 @@
+services:
+  codetrek:
+    image: sikamikaniko123/codetrek:latest
+    container_name: codetrek
+    restart: unless-stopped
+    ports:
+      # Placeholder host port — VERIFY THIS IS FREE ON ardi (via the homelab
+      # MCP's get_containers) before the first real deploy. No host
+      # networking/GPU/D-Bus needed for this app, unlike homelab-monitor.
+      - "8090:80"
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+    # No bundled Watchtower service here — ardi already runs one shared,
+    # label-scoped Watchtower instance (--label-enable --cleanup --interval 60)
+    # that picks up any service carrying the enable label above.

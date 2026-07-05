@@ -1,0 +1,36 @@
+{
+  "appName": "CodeTrek",
+  "profilePicker": {
+    "title": "Кой играе?",
+    "namePlaceholder": "Въведи името си",
+    "chooseAvatar": "Избери аватар",
+    "createProfile": "Създай профил",
+    "switchProfile": "Смени профила",
+    "startPlaying": "Започни играта",
+    "languageLabel": "Език",
+    "maxProfilesReached": "Достигнат е максимумът от 4 профила.",
+    "nameRequired": "Моля, въведи име."
+  },
+  "nav": {
+    "backToMap": "Назад към картата",
+    "backToProfiles": "Смени профила",
+    "worldMapTitle": "Избери ниво"
+  },
+  "levelPlay": {
+    "run": "Пусни",
+    "step": "Стъпка",
+    "reset": "Отначало",
+    "revealCode": "Покажи кода",
+    "hideCode": "Скрий кода",
+    "nextLevel": "Следващо ниво",
+    "tryAgain": "Опитай пак",
+    "goal": "Цел",
+    "hints": "Подсказки",
+    "crashed": "Ох — роботът се удари в стена!",
+    "notThere": "Почти — опитай пак!"
+  },
+  "language": {
+    "en": "Английски",
+    "bg": "Български"
+  }
+}

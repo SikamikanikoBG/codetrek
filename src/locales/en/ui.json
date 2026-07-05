@@ -1,0 +1,20 @@
+{
+  "levelStatus": {
+    "locked": "Locked",
+    "unlocked": "Ready to play",
+    "completed": "Completed"
+  },
+  "xpToast": "+{{xp}} XP!",
+  "starsEarned_one": "{{count}} star earned",
+  "starsEarned_other": "{{count}} stars earned",
+  "badgeEarnedToast": "Badge earned: {{badge}}!",
+  "badges": {
+    "firstSteps": "First Steps — complete your first level",
+    "loopExplorer": "Loop Explorer — complete 3 levels using loops",
+    "conditionalThinker": "Conditional Thinker — complete a level using an if-block",
+    "variableWizard": "Variable Wizard — complete a level using a variable",
+    "perfectionist": "Perfectionist — earn 3 stars on 5 levels",
+    "world1Complete": "World 1 Complete — finish every level in World 1"
+  },
+  "dailyChallengeNote": "Daily Challenge remixes levels you've already learned with new numbers — it's practice, not new lessons."
+}

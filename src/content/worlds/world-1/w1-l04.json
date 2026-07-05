@@ -1,0 +1,19 @@
+{
+  "id": "w1-l04",
+  "worldId": "world-1",
+  "order": 4,
+  "tier": "icon",
+  "scenario": "robot-grid",
+  "toolboxRef": "icon",
+  "goal": {
+    "gridWidth": 5,
+    "gridHeight": 5,
+    "start": { "x": 0, "y": 0 },
+    "startDirection": "east",
+    "target": { "x": 4, "y": 4 },
+    "obstacles": [{ "x": 2, "y": 1 }, { "x": 2, "y": 2 }]
+  },
+  "starRules": { "threeStar": { "maxBlocks": 9 } },
+  "concepts": ["sequence", "turn", "obstacle-avoidance"],
+  "hints": []
+}

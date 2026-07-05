@@ -1,0 +1,25 @@
+{
+  "id": "w1-l11",
+  "worldId": "world-1",
+  "order": 11,
+  "tier": "block-text",
+  "scenario": "robot-grid",
+  "titleKey": "levels:w1-l11.title",
+  "toolboxRef": "block-text",
+  "goal": {
+    "gridWidth": 7,
+    "gridHeight": 7,
+    "start": { "x": 0, "y": 3 },
+    "startDirection": "east",
+    "target": { "x": 6, "y": 3 },
+    "obstacles": [
+      { "x": 2, "y": 3 },
+      { "x": 4, "y": 3 },
+      { "x": 4, "y": 2 },
+      { "x": 4, "y": 4 }
+    ]
+  },
+  "starRules": { "threeStar": { "maxBlocks": 10 } },
+  "concepts": ["loop", "conditional", "obstacle-avoidance"],
+  "hints": ["levels:w1-l11.hint1", "levels:w1-l11.hint2"]
+}

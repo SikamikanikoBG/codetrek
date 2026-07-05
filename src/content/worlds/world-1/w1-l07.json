@@ -1,0 +1,19 @@
+{
+  "id": "w1-l07",
+  "worldId": "world-1",
+  "order": 7,
+  "tier": "block-text",
+  "scenario": "robot-grid",
+  "titleKey": "levels:w1-l07.title",
+  "toolboxRef": "block-text",
+  "goal": {
+    "gridWidth": 10,
+    "gridHeight": 1,
+    "start": { "x": 0, "y": 0 },
+    "startDirection": "east",
+    "target": { "x": 9, "y": 0 }
+  },
+  "starRules": { "threeStar": { "maxBlocks": 4 } },
+  "concepts": ["variable", "loop"],
+  "hints": ["levels:w1-l07.hint1", "levels:w1-l07.hint2"]
+}

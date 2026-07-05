@@ -1,0 +1,36 @@
+{
+  "appName": "CodeTrek",
+  "profilePicker": {
+    "title": "Who's playing?",
+    "namePlaceholder": "Enter your name",
+    "chooseAvatar": "Choose your avatar",
+    "createProfile": "Create Profile",
+    "switchProfile": "Switch Profile",
+    "startPlaying": "Start Playing",
+    "languageLabel": "Language",
+    "maxProfilesReached": "You've reached the maximum of 4 profiles.",
+    "nameRequired": "Please enter a name."
+  },
+  "nav": {
+    "backToMap": "Back to Map",
+    "backToProfiles": "Switch Profile",
+    "worldMapTitle": "Choose a Level"
+  },
+  "levelPlay": {
+    "run": "Run",
+    "step": "Step",
+    "reset": "Reset",
+    "revealCode": "Reveal Code",
+    "hideCode": "Hide Code",
+    "nextLevel": "Next Level",
+    "tryAgain": "Try Again",
+    "goal": "Goal",
+    "hints": "Hints",
+    "crashed": "Oops — the robot hit a wall!",
+    "notThere": "Not quite — try again!"
+  },
+  "language": {
+    "en": "English",
+    "bg": "Bulgarian"
+  }
+}
