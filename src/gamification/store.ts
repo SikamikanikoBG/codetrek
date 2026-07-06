@@ -110,6 +110,20 @@ export function recordLevelCompletion(
   return { profile, xpAwarded, stars: bestStars, newBadges };
 }
 
+/** Marks the given concept ids as introduced for this profile so Buddy's
+ * new-skill intro doesn't repeat them. No-ops for an unknown profile. */
+export function markConceptsSeen(profileId: string, conceptIds: string[]): void {
+  if (conceptIds.length === 0) return;
+  const store = readStore();
+  const profile = store.profiles.find((p) => p.id === profileId);
+  if (!profile) return;
+  const seen = new Set(profile.seenConcepts ?? []);
+  for (const id of conceptIds) seen.add(id);
+  profile.seenConcepts = Array.from(seen);
+  writeStore(store);
+  notifyProfileChanged(profile);
+}
+
 export function getLevelStatusMap(
   profile: Profile,
   levels: Level[],

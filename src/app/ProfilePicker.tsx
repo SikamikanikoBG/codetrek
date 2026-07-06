@@ -6,6 +6,7 @@ import { setSyncMeta } from '../storage/syncMeta';
 import { linkDevice } from '../sync/client';
 import { AVATARS, avatarGlyph, MAX_PROFILES } from './avatars';
 import { setActiveLanguage } from './i18n';
+import { AboutModal } from './AboutModal';
 
 interface ProfilePickerProps {
   onProfileSelected: (profile: Profile) => void;
@@ -23,6 +24,7 @@ export function ProfilePicker({ onProfileSelected }: ProfilePickerProps) {
   const [linkCodeInput, setLinkCodeInput] = useState('');
   const [linkBusy, setLinkBusy] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
+  const [showAbout, setShowAbout] = useState(false);
 
   const canCreateMore = store.profiles.length < MAX_PROFILES;
 
@@ -82,6 +84,11 @@ export function ProfilePicker({ onProfileSelected }: ProfilePickerProps) {
   return (
     <div className="profile-picker">
       <h1>{t('profilePicker.title')}</h1>
+
+      <button type="button" className="link-button" onClick={() => setShowAbout(true)}>
+        {t('about.openLink')}
+      </button>
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
 
       {store.profiles.length > 0 && (
         <div className="profile-picker__existing">

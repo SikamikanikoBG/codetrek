@@ -1,0 +1,41 @@
+{
+  "name": "Buddy",
+  "concepts": {
+    "sequence": {
+      "title": "Step by Step",
+      "explain": "A program runs its blocks one after another, in order — just like following a recipe. Each step waits its turn."
+    },
+    "turn": {
+      "title": "Turning",
+      "explain": "A 'turn' block spins your robot to face a new direction without moving it forward. Mix turns with moves to travel any path."
+    },
+    "loop": {
+      "title": "Repeat Blocks",
+      "explain": "Instead of copying the same block again and again, a 'repeat' block runs everything inside it a set number of times. Fewer blocks, same result!"
+    },
+    "conditional": {
+      "title": "Making Choices",
+      "explain": "An 'if' block checks something first — like whether the path ahead is clear — and only runs its blocks when that's true."
+    },
+    "variable": {
+      "title": "Remembering Numbers",
+      "explain": "A variable is a labeled box that holds a number you can reuse. Set it once, then use it anywhere — change the box, and everything using it updates too."
+    },
+    "obstacleAvoidance": {
+      "title": "Watching for Walls",
+      "explain": "Check whether the path ahead is clear before moving. If it isn't, turn instead of crashing — planning ahead beats guessing."
+    }
+  },
+  "nudge": {
+    "idle": "Not sure where to start? Drag a block into the workspace and press Run — you can always try again!",
+    "hintIntro": "Here's a hint:",
+    "genericHint": "Try changing the order of your blocks, or how many times a loop repeats.",
+    "explainOffer": "This level is all about {{concept}}. Want me to explain how it works?",
+    "explainCta": "Explain {{concept}}",
+    "hintsCta": "Show more hints",
+    "newSkillTitle": "New skill: {{concept}}",
+    "newSkillCta": "Got it, let's go!",
+    "dismiss": "Maybe later",
+    "closeExplain": "Thanks, Buddy!"
+  }
+}

@@ -41,5 +41,14 @@
   "language": {
     "en": "English",
     "bg": "Bulgarian"
+  },
+  "about": {
+    "openLink": "What is CodeTrek?",
+    "title": "What is CodeTrek?",
+    "intro": "CodeTrek is a free, open-source coding journey for kids — no reading required to start, no account needed to play.",
+    "point1": "Start with icon-only puzzles, grow into text-labeled blocks, and eventually real code — one continuous journey, not separate apps.",
+    "point2": "Buddy, the on-screen companion, notices when you're stuck and explains ideas like loops and choices as you play — teaching, not just testing.",
+    "point3": "Fully bilingual (English/Bulgarian), works on desktop and mobile, and everything stays on this device unless you turn on sync.",
+    "close": "Close"
   }
 }

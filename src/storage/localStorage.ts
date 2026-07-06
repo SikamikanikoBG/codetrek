@@ -26,6 +26,10 @@ export interface Profile {
   badges: string[];
   progress: Record<string, ProfileProgressEntry>;
   dailyChallenge?: DailyChallengeState;
+  /** Concept ids (content/concepts.ts) Buddy has already introduced to this
+   * profile — optional so profiles created before this field existed just
+   * treat it as empty rather than needing a migration step. */
+  seenConcepts?: string[];
 }
 
 export interface ProfileStoreV1 {

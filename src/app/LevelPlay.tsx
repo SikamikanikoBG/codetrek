@@ -6,7 +6,11 @@ import { createInitialState, type RobotState } from '../engine/robotGrid';
 import { runProgram, type ExecutionResult } from '../engine/runner';
 import { getAllLevels } from '../content/manifest';
 import { getWorldMeta } from '../content/worldMeta';
-import { recordLevelCompletion } from '../gamification/store';
+import { recordLevelCompletion, markConceptsSeen } from '../gamification/store';
+import { findUnseenConcepts, getConceptInfo, type ConceptInfo } from '../content/concepts';
+import { useStuckDetector } from './useStuckDetector';
+import type { StuckTier } from '../gamification/stuckDetector';
+import { Buddy } from './Buddy';
 import { ConfettiBurst } from './ConfettiBurst';
 import { XpToast } from './XpToast';
 import type { Level } from '../content/types';
@@ -39,12 +43,29 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
   const [showXpToast, setShowXpToast] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  const seenConceptsRef = useRef<Set<string>>(new Set(profile.seenConcepts ?? []));
+  const [conceptIntro, setConceptIntro] = useState<ConceptInfo[] | null>(null);
+  const [hintsOpen, setHintsOpen] = useState(false);
+  const [explainOpen, setExplainOpen] = useState(false);
+  const stuckDetector = useStuckDetector(level.id);
+
   useEffect(() => {
     startTimeRef.current = Date.now();
+    setHintsOpen(false);
+    setExplainOpen(false);
+    const unseen = findUnseenConcepts(level.concepts, Array.from(seenConceptsRef.current));
+    setConceptIntro(unseen.length > 0 ? unseen : null);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [level.id]);
+  }, [level.id, level.concepts]);
+
+  function dismissConceptIntro(concepts: ConceptInfo[]) {
+    const ids = concepts.map((c) => c.id);
+    for (const id of ids) seenConceptsRef.current.add(id);
+    markConceptsSeen(profile.id, ids);
+    setConceptIntro(null);
+  }
 
   function resetScenario() {
     if (timerRef.current) {
@@ -57,6 +78,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
     setCompletion(null);
     setShowXpToast(false);
     setMessage(null);
+    setExplainOpen(false);
     setRobotState(createInitialState(level.goal));
     blocklyRef.current?.highlightBlock(null);
     startTimeRef.current = Date.now();
@@ -75,6 +97,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
       }
       if (execResult.error) {
         setMessage(execResult.error);
+        stuckDetector.reportAttempt(execResult.error);
       } else if (execResult.won) {
         const blocksUsed = blocklyRef.current?.countBlocks() ?? 0;
         const movesUsed = execResult.steps.filter((s, i) => {
@@ -90,14 +113,17 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
           movesUsed,
           timeSeconds,
         });
+        stuckDetector.reportSuccess();
         if (outcome) {
           setCompletion({ xpAwarded: outcome.xpAwarded, stars: outcome.stars, newBadges: outcome.newBadges });
           setShowXpToast(outcome.xpAwarded > 0);
         }
       } else if (execResult.crashed) {
         setMessage(t('levelPlay.crashed'));
+        stuckDetector.reportAttempt('crashed');
       } else {
         setMessage(t('levelPlay.notThere'));
+        stuckDetector.reportAttempt('not-there');
       }
     }
   }
@@ -164,6 +190,21 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
 
   return (
     <div className="level-play">
+      {conceptIntro && (
+        <Buddy
+          variant="focused"
+          mood="curious"
+          conceptId={conceptIntro[0].id}
+          message={
+            <>
+              <strong>{t(`buddy:nudge.newSkillTitle`, { concept: t(conceptIntro[0].titleKey) })}</strong>
+              <br />
+              {t(conceptIntro[0].explainKey)}
+            </>
+          }
+          actions={[{ label: t('buddy:nudge.newSkillCta'), onClick: () => dismissConceptIntro(conceptIntro), primary: true }]}
+        />
+      )}
       <header className="level-play__header">
         <button type="button" className="btn btn-secondary" onClick={onBackToMap}>
           {t('nav.backToMap')}
@@ -202,8 +243,23 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
 
           {message && <p className="level-play__message">{message}</p>}
 
+          {!conceptIntro && !completion && stuckDetector.tier > 0 && (
+            <StuckBuddy
+              tier={stuckDetector.tier}
+              level={level}
+              explainOpen={explainOpen}
+              onOpenHints={() => setHintsOpen(true)}
+              onOpenExplain={() => setExplainOpen(true)}
+              onCloseExplain={() => {
+                setExplainOpen(false);
+                stuckDetector.dismiss();
+              }}
+              onDismiss={() => stuckDetector.dismiss()}
+            />
+          )}
+
           {hintKeys.length > 0 && (
-            <details className="level-play__hints">
+            <details className="level-play__hints" open={hintsOpen} onToggle={(e) => setHintsOpen(e.currentTarget.open)}>
               <summary>{t('levelPlay.hints')}</summary>
               <ul>
                 {hintKeys.map((key) => (
@@ -259,4 +315,73 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
 
 function toCamel(id: string): string {
   return id.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+}
+
+interface StuckBuddyProps {
+  tier: StuckTier;
+  level: Level;
+  explainOpen: boolean;
+  onOpenHints: () => void;
+  onOpenExplain: () => void;
+  onCloseExplain: () => void;
+  onDismiss: () => void;
+}
+
+/** Renders whichever thing Buddy should say for the current stuck tier — a
+ * gentle nudge, the level's own hint, or (tier 3 / after tapping "Explain")
+ * a short teaching moment about the level's primary concept. */
+function StuckBuddy({ tier, level, explainOpen, onOpenHints, onOpenExplain, onCloseExplain, onDismiss }: StuckBuddyProps) {
+  const { t } = useTranslation(['buddy', 'levels']);
+  const primaryConcept = level.concepts[0] ? getConceptInfo(level.concepts[0]) : null;
+
+  if (explainOpen && primaryConcept) {
+    return (
+      <Buddy
+        mood="thinking"
+        conceptId={primaryConcept.id}
+        message={t(primaryConcept.explainKey)}
+        actions={[{ label: t('buddy:nudge.closeExplain'), onClick: onCloseExplain, primary: true }]}
+      />
+    );
+  }
+
+  if (tier === 1) {
+    return <Buddy mood="idle" message={t('buddy:nudge.idle')} onDismiss={onDismiss} />;
+  }
+
+  if (tier === 2) {
+    const hintKey = level.hints[0];
+    const hintText = hintKey ? t(hintKey) : t('buddy:nudge.genericHint');
+    return (
+      <Buddy
+        mood="thinking"
+        message={
+          <>
+            {t('buddy:nudge.hintIntro')} {hintText}
+          </>
+        }
+        actions={level.hints.length > 1 ? [{ label: t('buddy:nudge.hintsCta'), onClick: onOpenHints }] : undefined}
+        onDismiss={onDismiss}
+      />
+    );
+  }
+
+  if (primaryConcept) {
+    return (
+      <Buddy
+        mood="curious"
+        message={t('buddy:nudge.explainOffer', { concept: t(primaryConcept.titleKey) })}
+        actions={[
+          {
+            label: t('buddy:nudge.explainCta', { concept: t(primaryConcept.titleKey) }),
+            onClick: onOpenExplain,
+            primary: true,
+          },
+        ]}
+        onDismiss={onDismiss}
+      />
+    );
+  }
+
+  return <Buddy mood="thinking" message={t('buddy:nudge.genericHint')} onDismiss={onDismiss} />;
 }
