@@ -35,6 +35,7 @@ export function createProfile(name: string, avatarId: string, languagePref: 'en'
   store.profiles.push(profile);
   store.activeProfileId = profile.id;
   writeStore(store);
+  notifyProfileChanged(profile);
   return profile;
 }
 
