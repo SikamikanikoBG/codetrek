@@ -9,14 +9,7 @@
     "startPlaying": "Start Playing",
     "languageLabel": "Language",
     "maxProfilesReached": "You've reached the maximum of 4 profiles.",
-    "nameRequired": "Please enter a name.",
-    "linkDevice": "Have a Sync Code From Another Device?",
-    "linkCodeLabel": "Enter the code",
-    "linkCodePlaceholder": "e.g. 7G2BBQ",
-    "linkButton": "Link This Device",
-    "linking": "Linking…",
-    "linkCodeRequired": "Please enter a code.",
-    "linkError": "That code didn't work — check it and try again."
+    "nameRequired": "Please enter a name."
   },
   "nav": {
     "backToMap": "Back to Map",
@@ -45,10 +38,10 @@
   "about": {
     "openLink": "What is CodeTrek?",
     "title": "What is CodeTrek?",
-    "intro": "CodeTrek is a free, open-source coding journey for kids — no reading required to start, no account needed to play.",
+    "intro": "CodeTrek is a free, open-source coding journey for kids — no reading required to start. One household account, then just pick a kid profile and play.",
     "point1": "Start with icon-only puzzles, grow into text-labeled blocks, and eventually real code — one continuous journey, not separate apps.",
     "point2": "Buddy, the on-screen companion, notices when you're stuck and explains ideas like loops and choices as you play — teaching, not just testing.",
-    "point3": "Fully bilingual (English/Bulgarian), works on desktop and mobile, and everything stays on this device unless you turn on sync.",
+    "point3": "Fully bilingual (English/Bulgarian), works on desktop and mobile, and progress follows your account to any device — no ads, nothing sold.",
     "close": "Close"
   }
 }

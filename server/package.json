@@ -1,9 +1,9 @@
 {
   "name": "codetrek-api",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
-  "description": "Small Express + SQLite backend for optional CodeTrek cross-device profile sync (github.com/SikamikanikoBG/codetrek issue #1). No accounts/passwords — link-code + per-device-token model only.",
+  "description": "Express + SQLite backend for CodeTrek accounts: username/password sign-in (scrypt-hashed, session tokens) and account-scoped profile storage.",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

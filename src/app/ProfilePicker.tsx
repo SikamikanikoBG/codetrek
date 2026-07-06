@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getStore, createProfile, switchProfile } from '../gamification/store';
-import { writeStore, type Profile } from '../storage/localStorage';
-import { setSyncMeta } from '../storage/syncMeta';
-import { linkDevice } from '../sync/client';
+import type { Profile } from '../storage/localStorage';
 import { AVATARS, avatarGlyph, MAX_PROFILES } from './avatars';
 import { setActiveLanguage } from './i18n';
 import { AboutModal } from './AboutModal';
@@ -19,11 +17,6 @@ export function ProfilePicker({ onProfileSelected }: ProfilePickerProps) {
   const [avatarId, setAvatarId] = useState(AVATARS[0].id);
   const [languagePref, setLanguagePref] = useState<'en' | 'bg'>('en');
   const [error, setError] = useState<string | null>(null);
-
-  const [showLinkForm, setShowLinkForm] = useState(false);
-  const [linkCodeInput, setLinkCodeInput] = useState('');
-  const [linkBusy, setLinkBusy] = useState(false);
-  const [linkError, setLinkError] = useState<string | null>(null);
   const [showAbout, setShowAbout] = useState(false);
 
   const canCreateMore = store.profiles.length < MAX_PROFILES;
@@ -43,42 +36,6 @@ export function ProfilePicker({ onProfileSelected }: ProfilePickerProps) {
     setActiveLanguage(languagePref);
     setStore(getStore());
     onProfileSelected(profile);
-  }
-
-  async function handleLinkSubmit() {
-    if (!linkCodeInput.trim()) {
-      setLinkError(t('profilePicker.linkCodeRequired'));
-      return;
-    }
-    setLinkBusy(true);
-    setLinkError(null);
-    try {
-      const result = await linkDevice(linkCodeInput);
-      const current = getStore();
-      const existingIndex = current.profiles.findIndex((p) => p.id === result.profile.id);
-      if (existingIndex >= 0) {
-        current.profiles[existingIndex] = result.profile;
-      } else if (current.profiles.length < MAX_PROFILES) {
-        current.profiles.push(result.profile);
-      } else {
-        setLinkError(t('profilePicker.maxProfilesReached'));
-        setLinkBusy(false);
-        return;
-      }
-      current.activeProfileId = result.profile.id;
-      writeStore(current);
-      setSyncMeta(result.profile.id, { deviceToken: result.deviceToken });
-
-      setActiveLanguage(result.profile.languagePref);
-      setStore(getStore());
-      setShowLinkForm(false);
-      setLinkCodeInput('');
-      onProfileSelected(result.profile);
-    } catch {
-      setLinkError(t('profilePicker.linkError'));
-    } finally {
-      setLinkBusy(false);
-    }
   }
 
   return (
@@ -107,30 +64,6 @@ export function ProfilePicker({ onProfileSelected }: ProfilePickerProps) {
           ))}
         </div>
       )}
-
-      <div className="profile-picker__link">
-        <button type="button" className="btn btn-secondary" onClick={() => setShowLinkForm((s) => !s)}>
-          {t('profilePicker.linkDevice')}
-        </button>
-        {showLinkForm && (
-          <div className="profile-picker__link-form">
-            <label className="flabel" htmlFor="link-code-input">
-              {t('profilePicker.linkCodeLabel')}
-            </label>
-            <input
-              id="link-code-input"
-              type="text"
-              value={linkCodeInput}
-              placeholder={t('profilePicker.linkCodePlaceholder')}
-              onChange={(e) => setLinkCodeInput(e.target.value)}
-            />
-            {linkError && <p className="profile-picker__error">{linkError}</p>}
-            <button type="button" className="btn btn-primary" onClick={handleLinkSubmit} disabled={linkBusy}>
-              {linkBusy ? t('profilePicker.linking') : t('profilePicker.linkButton')}
-            </button>
-          </div>
-        )}
-      </div>
 
       {canCreateMore ? (
         <div className="profile-picker__create">

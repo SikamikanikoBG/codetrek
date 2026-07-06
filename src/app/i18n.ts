@@ -9,22 +9,28 @@ import enCommon from '../locales/en/common.json';
 import enLevels from '../locales/en/levels.json';
 import enUi from '../locales/en/ui.json';
 import enBuddy from '../locales/en/buddy.json';
+import enAuth from '../locales/en/auth.json';
 import bgCommon from '../locales/bg/common.json';
 import bgLevels from '../locales/bg/levels.json';
 import bgUi from '../locales/bg/ui.json';
 import bgBuddy from '../locales/bg/buddy.json';
+import bgAuth from '../locales/bg/auth.json';
 
 export const SUPPORTED_LANGUAGES = ['en', 'bg'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 void i18n.use(initReactI18next).init({
   resources: {
-    en: { common: enCommon, levels: enLevels, ui: enUi, buddy: enBuddy },
-    bg: { common: bgCommon, levels: bgLevels, ui: bgUi, buddy: bgBuddy },
+    en: { common: enCommon, levels: enLevels, ui: enUi, buddy: enBuddy, auth: enAuth },
+    bg: { common: bgCommon, levels: bgLevels, ui: bgUi, buddy: bgBuddy, auth: bgAuth },
   },
-  lng: 'en', // overridden immediately on app boot once the active profile (if any) is known
+  // Before any profile/session exists, the auth gate (App.tsx) has no
+  // profile to derive a language from — it defaults to 'en' and offers its
+  // own EN/BG toggle (AuthScreen.tsx), same pattern as ProfilePicker's
+  // create-profile form. Overridden the moment an active profile is known.
+  lng: 'en',
   fallbackLng: 'en',
-  ns: ['common', 'levels', 'ui', 'buddy'],
+  ns: ['common', 'levels', 'ui', 'buddy', 'auth'],
   defaultNS: 'common',
   interpolation: { escapeValue: false },
   returnNull: false,

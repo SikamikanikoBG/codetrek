@@ -25,29 +25,26 @@ toward real code. Built for two kids, shared in case it's useful for yours.
   (not browser locale) — icon-tier levels use zero text by schema, so a
   pre-reader's experience can never silently break on a missing translation.
 - **Works everywhere.** Touch and mouse, desktop and mobile.
-- **No account required.** Local profiles live in the browser. An optional,
-  privacy-respecting sync (a 6-character link code, no email/password) lets a
-  profile hop between a kid's own devices.
+- **One account per household.** Username/password, no email required. Sign
+  in on any device and a kid's profiles and progress come with you — no
+  ads, no data sold. Passwords are scrypt-hashed; see [`server/`](server/)
+  for the accounts backend.
 
 ## Tech stack
 
 React + TypeScript + Vite, Google Blockly for the visual editor, a sandboxed
 JS-Interpreter driving a robot-grid scenario engine, react-i18next for EN/BG,
-and a small optional Express + SQLite backend (`server/`) purely for
-cross-device profile sync — everything else is static and runs entirely in
-the browser.
+and an Express + SQLite backend (`server/`) for accounts and profile
+storage — gameplay itself still runs entirely in the browser, with
+localStorage as an offline-tolerant cache once signed in.
 
 ## Running locally
 
-```bash
-npm ci
-npm run dev        # http://localhost:5173
-```
-
-Optional sync backend (only needed to test cross-device linking):
+The accounts backend is required (the app gates behind sign-in):
 
 ```bash
 cd server && npm ci && npm run dev   # http://localhost:4000
+npm ci && npm run dev                # http://localhost:5173, in the repo root
 ```
 
 ### Tests & checks
@@ -62,11 +59,12 @@ npm run lint         # oxlint
 
 ```bash
 docker build -t codetrek .
-docker run -p 8080:80 codetrek
+docker run -p 8080:8080 codetrek
 ```
 
+Runs as a non-root user (`nginxinc/nginx-unprivileged`), listening on 8080.
 `docker-compose.yml`/`nginx.conf` examples for a self-hosted deploy (with the
-optional sync backend as a sidecar service) live in [`deploy/`](deploy/).
+accounts backend as a sidecar service) live in [`deploy/`](deploy/).
 
 ## Roadmap
 
@@ -74,7 +72,9 @@ optional sync backend as a sidecar service) live in [`deploy/`](deploy/).
   no server-side code execution.
 - **Phase 3:** an AI-assistant-fluency track (working with Claude/ChatGPT/a
   local LLM as a coding partner).
-- **Phase 4:** accounts, more Worlds, mobile app packaging.
+- **Phase 4:** more Worlds, mobile app packaging.
+
+See [CHANGELOG.md](CHANGELOG.md) for what's shipped so far.
 
 ## Contributing
 

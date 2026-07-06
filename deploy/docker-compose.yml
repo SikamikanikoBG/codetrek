@@ -5,8 +5,9 @@ services:
     restart: unless-stopped
     ports:
       # 8090 was already taken by magicmirror on ardi (verified via the
-      # homelab MCP's get_containers) — 8092 confirmed free.
-      - "8092:80"
+      # homelab MCP's get_containers) — 8092 confirmed free. Container-side
+      # is 8080 (nginx-unprivileged's default), not 80 — see Dockerfile.
+      - "8092:8080"
     labels:
       com.centurylinklabs.watchtower.enable: "true"
     # No bundled Watchtower service here — ardi already runs one shared,
@@ -15,11 +16,11 @@ services:
     depends_on:
       - codetrek-api
 
-  # Small backend for optional cross-device profile sync (issue #1). Not
-  # published on a host port — nginx (the `codetrek` service above) reverse
-  # proxies /api/ to it over the compose-internal network (deploy/nginx.conf),
-  # so it's reachable only from inside this compose network, same "no
-  # exposure beyond the LAN/tailnet" spirit as the rest of the app.
+  # Accounts + profile storage backend. Not published on a host port — nginx
+  # (the `codetrek` service above) reverse proxies /api/ to it over the
+  # compose-internal network (deploy/nginx.conf), so it's reachable only
+  # from inside this compose network, same "no exposure beyond the LAN/
+  # tailnet" spirit as the rest of the app.
   codetrek-api:
     image: sikamikaniko123/codetrek-api:latest
     container_name: codetrek-api

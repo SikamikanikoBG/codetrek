@@ -10,6 +10,7 @@ interface WorldMapProps {
   onSelectLevel: (level: Level) => void;
   onSwitchProfile: () => void;
   onShowProgress: () => void;
+  onOpenAccount: () => void;
 }
 
 function LevelTile({
@@ -54,8 +55,8 @@ function LevelTile({
   );
 }
 
-export function WorldMap({ profile, onSelectLevel, onSwitchProfile, onShowProgress }: WorldMapProps) {
-  const { t } = useTranslation(['common', 'levels']);
+export function WorldMap({ profile, onSelectLevel, onSwitchProfile, onShowProgress, onOpenAccount }: WorldMapProps) {
+  const { t } = useTranslation(['common', 'levels', 'auth']);
   const allLevels = getAllLevels();
   const statusMap = getLevelStatusMap(profile, allLevels);
 
@@ -73,6 +74,9 @@ export function WorldMap({ profile, onSelectLevel, onSwitchProfile, onShowProgre
           </button>
           <button type="button" className="btn btn-secondary" onClick={onSwitchProfile}>
             {t('nav.backToProfiles')}
+          </button>
+          <button type="button" className="btn btn-secondary" onClick={onOpenAccount}>
+            {t('auth:account.openLink')}
           </button>
         </div>
       </header>

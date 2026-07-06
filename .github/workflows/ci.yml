@@ -64,7 +64,7 @@ jobs:
         run: docker build -t codetrek:ci .
 
       - name: Boot container
-        run: docker run -d --name codetrek-ci -p 8090:80 codetrek:ci
+        run: docker run -d --name codetrek-ci -p 8090:8080 codetrek:ci
 
       - name: Wait for health check (curl loop)
         run: |

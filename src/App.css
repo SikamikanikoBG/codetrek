@@ -175,25 +175,27 @@
   font-weight: 700;
 }
 
-/* ---------- Link-this-device (profile picker) ---------- */
+/* ---------- Auth gate (sign in / create account) ---------- */
 
-.profile-picker__link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
+.auth-screen__lang {
+  max-width: 240px;
 }
 
-.profile-picker__link-form {
+.auth-screen__subtitle {
+  color: var(--muted);
+  max-width: 440px;
+  margin: -8px 0 4px;
+}
+
+.auth-screen__form {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
 }
 
-.profile-picker__link-form input {
+.auth-screen__form input {
   font: inherit;
   font-family: var(--font-body);
   padding: 10px 12px;
@@ -202,9 +204,65 @@
   min-height: 44px;
   background: var(--surface-raised);
   color: var(--ink);
-  text-align: center;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+}
+
+.auth-screen__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  text-align: left;
+}
+
+.auth-screen__switch {
+  color: var(--muted);
+}
+
+/* ---------- Account settings panel ---------- */
+
+.account-panel__row {
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+.account-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.account-panel form input {
+  font: inherit;
+  font-family: var(--font-body);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  min-height: 44px;
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+
+.account-panel__success {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.account-panel__danger-zone {
+  border: 1px solid var(--danger);
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.account-panel__danger-zone h3 {
+  margin-top: 0;
+  color: var(--danger);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: var(--surface-raised);
+  border: none;
 }
 
 /* ---------- World map ---------- */
