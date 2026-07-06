@@ -16,9 +16,11 @@ toward real code. Built for two kids, shared in case it's useful for yours.
   editor scales from an icon-only toolbox (no reading required) to
   text-labeled blocks covering loops, conditionals, variables, and functions.
 - **Teaches, doesn't just test.** **Buddy**, an on-screen companion, notices
-  when a level isn't clicking — after a few failed tries it surfaces a hint,
-  and if that's still not enough, offers a short, animated explanation of the
-  underlying concept (what a loop actually *is*, not just "try again").
+  when a level isn't clicking and walks through a step-by-step checklist for
+  the concept involved — not a one-line definition. Hints cost a little XP,
+  like buying a clue, and every level has a **Show Solution** that builds a
+  real, idiomatic answer in the workspace and narrates why each piece is
+  there.
 - **Gamified progress.** XP, stars, badges, and a Progress view spanning
   multiple themed Worlds (Robots, AI Lab, more to come).
 - **Bilingual by construction.** English and Bulgarian, switched per profile

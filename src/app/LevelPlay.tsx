@@ -6,13 +6,17 @@ import { createInitialState, type RobotState } from '../engine/robotGrid';
 import { runProgram, type ExecutionResult } from '../engine/runner';
 import { getAllLevels } from '../content/manifest';
 import { getWorldMeta } from '../content/worldMeta';
-import { recordLevelCompletion, markConceptsSeen } from '../gamification/store';
+import { recordLevelCompletion, markConceptsSeen, purchaseHint, unlockedHintCount } from '../gamification/store';
+import { hintCost } from '../gamification/rules';
 import { findUnseenConcepts, getConceptInfo, type ConceptInfo } from '../content/concepts';
 import { useStuckDetector } from './useStuckDetector';
 import type { StuckTier } from '../gamification/stuckDetector';
-import { Buddy } from './Buddy';
+import { Buddy, ConceptSteps } from './Buddy';
 import { ConfettiBurst } from './ConfettiBurst';
 import { XpToast } from './XpToast';
+import { SolutionPanel } from './SolutionPanel';
+import { getSolution } from '../content/solutions';
+import { compileSolutionToWorkspaceJson } from '../content/solutionCompiler';
 import type { Level } from '../content/types';
 import type { Profile } from '../storage/localStorage';
 
@@ -49,16 +53,43 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
   const [explainOpen, setExplainOpen] = useState(false);
   const stuckDetector = useStuckDetector(level.id);
 
+  const [currentXp, setCurrentXp] = useState(profile.xp);
+  const [unlockedHints, setUnlockedHints] = useState(() => unlockedHintCount(profile, level.id));
+  const [showSolutionPanel, setShowSolutionPanel] = useState(false);
+  const [solutionBuilt, setSolutionBuilt] = useState(false);
+  const solution = getSolution(level.id);
+
   useEffect(() => {
     startTimeRef.current = Date.now();
     setHintsOpen(false);
     setExplainOpen(false);
+    setUnlockedHints(unlockedHintCount(profile, level.id));
+    setShowSolutionPanel(false);
+    setSolutionBuilt(false);
     const unseen = findUnseenConcepts(level.concepts, Array.from(seenConceptsRef.current));
     setConceptIntro(unseen.length > 0 ? unseen : null);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [level.id, level.concepts]);
+
+  function handleBuildSolution() {
+    if (!solution) return;
+    const hasExistingBlocks = (blocklyRef.current?.countBlocks() ?? 0) > 0;
+    if (hasExistingBlocks && !window.confirm(t('buddy:solution.buildConfirm'))) return;
+    blocklyRef.current?.loadSolutionJson(compileSolutionToWorkspaceJson(solution.steps));
+    setSolutionBuilt(true);
+    handleRun();
+  }
+
+  function handleBuyHint() {
+    const result = purchaseHint(profile.id, level.id);
+    if (result.ok) {
+      setCurrentXp(result.newXp);
+      setUnlockedHints((n) => n + 1);
+    }
+  }
 
   function dismissConceptIntro(concepts: ConceptInfo[]) {
     const ids = concepts.map((c) => c.id);
@@ -117,6 +148,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
         if (outcome) {
           setCompletion({ xpAwarded: outcome.xpAwarded, stars: outcome.stars, newBadges: outcome.newBadges });
           setShowXpToast(outcome.xpAwarded > 0);
+          setCurrentXp((xp) => xp + outcome.xpAwarded);
         }
       } else if (execResult.crashed) {
         setMessage(t('levelPlay.crashed'));
@@ -198,8 +230,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
           message={
             <>
               <strong>{t(`buddy:nudge.newSkillTitle`, { concept: t(conceptIntro[0].titleKey) })}</strong>
-              <br />
-              {t(conceptIntro[0].explainKey)}
+              <ConceptSteps stepsKey={conceptIntro[0].stepsKey} />
             </>
           }
           actions={[{ label: t('buddy:nudge.newSkillCta'), onClick: () => dismissConceptIntro(conceptIntro), primary: true }]}
@@ -209,10 +240,25 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
         <button type="button" className="btn btn-secondary" onClick={onBackToMap}>
           {t('nav.backToMap')}
         </button>
-        <button type="button" className="btn btn-secondary" onClick={handleToggleReveal}>
-          {revealCode ? t('levelPlay.hideCode') : t('levelPlay.revealCode')}
-        </button>
+        <div className="level-play__header-actions">
+          {solution && (
+            <button type="button" className="btn btn-secondary" onClick={() => setShowSolutionPanel(true)}>
+              {t('buddy:solution.title')}
+            </button>
+          )}
+          <button type="button" className="btn btn-secondary" onClick={handleToggleReveal}>
+            {revealCode ? t('levelPlay.hideCode') : t('levelPlay.revealCode')}
+          </button>
+        </div>
       </header>
+      {showSolutionPanel && solution && (
+        <SolutionPanel
+          steps={solution.steps}
+          built={solutionBuilt}
+          onBuild={handleBuildSolution}
+          onClose={() => setShowSolutionPanel(false)}
+        />
+      )}
 
       <div className="level-play__body">
         <div className="level-play__editor">
@@ -260,11 +306,30 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
 
           {hintKeys.length > 0 && (
             <details className="level-play__hints" open={hintsOpen} onToggle={(e) => setHintsOpen(e.currentTarget.open)}>
-              <summary>{t('levelPlay.hints')}</summary>
-              <ul>
-                {hintKeys.map((key) => (
-                  <li key={key}>{t(key)}</li>
-                ))}
+              <summary>
+                {t('levelPlay.hints')} <span className="xp-pill xp-pill--inline">{t('ui:hints.xpBalance', { xp: currentXp })}</span>
+              </summary>
+              <ul className="hint-list">
+                {hintKeys.map((key, index) => {
+                  const unlocked = index < unlockedHints;
+                  const cost = hintCost(index);
+                  return (
+                    <li key={key} className="hint-list__item">
+                      {unlocked ? (
+                        t(key)
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-secondary hint-list__buy"
+                          onClick={handleBuyHint}
+                          disabled={currentXp < cost || index > unlockedHints}
+                        >
+                          {t('ui:hints.buy', { cost })}
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </details>
           )}
@@ -339,7 +404,7 @@ function StuckBuddy({ tier, level, explainOpen, onOpenHints, onOpenExplain, onCl
       <Buddy
         mood="thinking"
         conceptId={primaryConcept.id}
-        message={t(primaryConcept.explainKey)}
+        message={<ConceptSteps stepsKey={primaryConcept.stepsKey} />}
         actions={[{ label: t('buddy:nudge.closeExplain'), onClick: onCloseExplain, primary: true }]}
       />
     );
@@ -350,17 +415,14 @@ function StuckBuddy({ tier, level, explainOpen, onOpenHints, onOpenExplain, onCl
   }
 
   if (tier === 2) {
-    const hintKey = level.hints[0];
-    const hintText = hintKey ? t(hintKey) : t('buddy:nudge.genericHint');
+    if (level.hints.length === 0) {
+      return <Buddy mood="thinking" message={t('buddy:nudge.genericHint')} onDismiss={onDismiss} />;
+    }
     return (
       <Buddy
         mood="thinking"
-        message={
-          <>
-            {t('buddy:nudge.hintIntro')} {hintText}
-          </>
-        }
-        actions={level.hints.length > 1 ? [{ label: t('buddy:nudge.hintsCta'), onClick: onOpenHints }] : undefined}
+        message={t('buddy:nudge.hintIntro')}
+        actions={[{ label: t('buddy:nudge.hintsCta'), onClick: onOpenHints, primary: true }]}
         onDismiss={onDismiss}
       />
     );

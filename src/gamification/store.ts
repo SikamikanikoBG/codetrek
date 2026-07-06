@@ -3,7 +3,7 @@
 // (XP + stars + badges), and level-status lookup for the world map.
 
 import { readStore, writeStore, type ProfileStoreV1, type Profile } from '../storage/localStorage';
-import { calculateXp, evaluateNewBadges, computeLevelStatus } from './rules';
+import { calculateXp, evaluateNewBadges, computeLevelStatus, hintCost } from './rules';
 import type { Level, StarRules } from '../content/types';
 import { calculateStars } from '../engine/robotGrid';
 import { notifyProfileChanged } from '../sync/hooks';
@@ -123,6 +123,35 @@ export function markConceptsSeen(profileId: string, conceptIds: string[]): void 
   profile.seenConcepts = Array.from(seen);
   writeStore(store);
   notifyProfileChanged(profile);
+}
+
+export type PurchaseHintResult = { ok: true; newXp: number } | { ok: false; reason: 'insufficient-xp' };
+
+/** Number of hints already unlocked (bought) for this level — 0 if the
+ * profile has never spent XP on this level's hints yet. */
+export function unlockedHintCount(profile: Profile, levelId: string): number {
+  return profile.purchasedHints?.[levelId] ?? 0;
+}
+
+/** Spends XP to unlock the NEXT locked hint for a level (hints unlock in
+ * order — you can't skip ahead to hint 2 without buying hint 1). XP spent
+ * is permanent: a hint stays unlocked for that profile+level forever, it's
+ * never re-charged. Returns 'insufficient-xp' without changing anything if
+ * the profile can't afford it. */
+export function purchaseHint(profileId: string, levelId: string): PurchaseHintResult {
+  const store = readStore();
+  const profile = store.profiles.find((p) => p.id === profileId);
+  if (!profile) return { ok: false, reason: 'insufficient-xp' };
+
+  const alreadyUnlocked = unlockedHintCount(profile, levelId);
+  const cost = hintCost(alreadyUnlocked);
+  if (profile.xp < cost) return { ok: false, reason: 'insufficient-xp' };
+
+  profile.xp -= cost;
+  profile.purchasedHints = { ...profile.purchasedHints, [levelId]: alreadyUnlocked + 1 };
+  writeStore(store);
+  notifyProfileChanged(profile);
+  return { ok: true, newXp: profile.xp };
 }
 
 export function getLevelStatusMap(

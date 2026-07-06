@@ -3,6 +3,31 @@
 All notable changes to CodeTrek are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.1.0] - 2026-07-06
+
+### Added
+- **Step-by-step concept explanations.** Buddy's teaching moments (new-skill
+  intros and the stuck-detector's tier-3 explain offer) now walk through a
+  concrete numbered checklist ("drag a repeat block in", "type how many
+  times", "drag move-forward inside it"...) instead of one summary sentence
+  — and each ends by suggesting how to combine it with another concept
+  (a loop with a turn inside, a variable feeding a loop's count).
+- **Hints now cost XP**, like buying a clue: each level's hints unlock in
+  order, escalating in cost (5, 10, 15 XP...), staying unlocked permanently
+  once bought. The stuck-detector's tier-2 nudge now points at the hints
+  panel instead of giving the first hint away for free.
+- **Show Solution.** Every level has a hand-authored, validated solution
+  using the SAME concept it teaches (a loop level gets a real repeat block,
+  not flat moves) — "How to Solve This Level" narrates it step by step,
+  nested to match the actual structure (a loop's body, an if/else's
+  branches, shown indented underneath), then "Build This For Me" builds the
+  exact same blocks in the workspace and runs them.
+- A BFS pathfinder (`engine/solver.ts`) and a small DSL→Blockly-JSON
+  compiler (`content/solutionCompiler.ts`) back the above — every one of the
+  21 levels' authored solutions is validated end-to-end in CI (compiled to
+  real Blockly blocks, code-generated through the actual javascriptGenerator,
+  run through the actual win-check), not just hand-traced.
+
 ## [1.0.1] - 2026-07-06
 
 ### Fixed

@@ -30,6 +30,10 @@ export interface Profile {
    * profile — optional so profiles created before this field existed just
    * treat it as empty rather than needing a migration step. */
   seenConcepts?: string[];
+  /** Per-level count of hints unlocked by spending XP (0 = none bought yet,
+   * persists permanently once bought — never re-charged). Optional for the
+   * same migration-safety reason as seenConcepts. */
+  purchasedHints?: Record<string, number>;
 }
 
 export interface ProfileStoreV1 {

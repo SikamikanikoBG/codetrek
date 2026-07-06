@@ -25,13 +25,17 @@ describe('buddy.json en/bg parity', () => {
     expect(collectLeafPaths(bg).sort()).toEqual(collectLeafPaths(en).sort());
   });
 
-  it('every ConceptInfo titleKey/explainKey resolves to non-empty text in both languages', () => {
+  it('every ConceptInfo titleKey resolves to non-empty text, and stepsKey to a non-empty array, in both languages', () => {
     for (const info of Object.values(CONCEPTS)) {
-      for (const key of [info.titleKey, info.explainKey]) {
-        const path = key.replace(/^buddy:/, '');
-        expect(get(en, path), `en missing ${key}`).toBeTruthy();
-        expect(get(bg, path), `bg missing ${key}`).toBeTruthy();
-      }
+      const titlePath = info.titleKey.replace(/^buddy:/, '');
+      expect(get(en, titlePath), `en missing ${info.titleKey}`).toBeTruthy();
+      expect(get(bg, titlePath), `bg missing ${info.titleKey}`).toBeTruthy();
+
+      const stepsPath = info.stepsKey.replace(/^buddy:/, '');
+      const enSteps = get(en, stepsPath);
+      const bgSteps = get(bg, stepsPath);
+      expect(Array.isArray(enSteps) && enSteps.length > 0, `en missing/empty ${info.stepsKey}`).toBe(true);
+      expect(Array.isArray(bgSteps) && bgSteps.length > 0, `bg missing/empty ${info.stepsKey}`).toBe(true);
     }
   });
 });

@@ -10,8 +10,11 @@ export interface ConceptInfo {
   id: ConceptId;
   /** i18n key (namespace `buddy`) for the short display title. */
   titleKey: string;
-  /** i18n key (namespace `buddy`) for the one-paragraph kid-friendly explanation. */
-  explainKey: string;
+  /** i18n key (namespace `buddy`) for an ARRAY of step-by-step "how to use
+   * this block" instructions — deliberately plural/numbered rather than one
+   * summary sentence, so a stuck parent gets something they can actually
+   * try, not just a definition. */
+  stepsKey: string;
   /** Emoji sequence for the animated mini-demo (ConceptDemo) — plays in order, then loops. */
   demoGlyphs: string[];
 }
@@ -20,37 +23,37 @@ export const CONCEPTS: Record<ConceptId, ConceptInfo> = {
   sequence: {
     id: 'sequence',
     titleKey: 'buddy:concepts.sequence.title',
-    explainKey: 'buddy:concepts.sequence.explain',
+    stepsKey: 'buddy:concepts.sequence.steps',
     demoGlyphs: ['👣', '👣', '👣', '🏁'],
   },
   turn: {
     id: 'turn',
     titleKey: 'buddy:concepts.turn.title',
-    explainKey: 'buddy:concepts.turn.explain',
+    stepsKey: 'buddy:concepts.turn.steps',
     demoGlyphs: ['🧭', '↩️', '👣'],
   },
   loop: {
     id: 'loop',
     titleKey: 'buddy:concepts.loop.title',
-    explainKey: 'buddy:concepts.loop.explain',
+    stepsKey: 'buddy:concepts.loop.steps',
     demoGlyphs: ['🔁', '👣', '👣', '👣'],
   },
   conditional: {
     id: 'conditional',
     titleKey: 'buddy:concepts.conditional.title',
-    explainKey: 'buddy:concepts.conditional.explain',
+    stepsKey: 'buddy:concepts.conditional.steps',
     demoGlyphs: ['❓', '↔️', '👣'],
   },
   variable: {
     id: 'variable',
     titleKey: 'buddy:concepts.variable.title',
-    explainKey: 'buddy:concepts.variable.explain',
+    stepsKey: 'buddy:concepts.variable.steps',
     demoGlyphs: ['📦', '3️⃣', '👣'],
   },
   'obstacle-avoidance': {
     id: 'obstacle-avoidance',
     titleKey: 'buddy:concepts.obstacleAvoidance.title',
-    explainKey: 'buddy:concepts.obstacleAvoidance.explain',
+    stepsKey: 'buddy:concepts.obstacleAvoidance.steps',
     demoGlyphs: ['🧱', '❓', '↩️'],
   },
 };

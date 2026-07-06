@@ -39,5 +39,9 @@
     "noActivity": "No levels completed yet — go earn your first star!",
     "completedOn": "Completed {{date}}"
   },
-  "dailyChallengeNote": "Daily Challenge remixes levels you've already learned with new numbers — it's practice, not new lessons."
+  "dailyChallengeNote": "Daily Challenge remixes levels you've already learned with new numbers — it's practice, not new lessons.",
+  "hints": {
+    "xpBalance": "{{xp}} XP to spend",
+    "buy": "Unlock for {{cost}} XP"
+  }
 }

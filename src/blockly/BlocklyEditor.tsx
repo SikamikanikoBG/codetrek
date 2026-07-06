@@ -100,6 +100,10 @@ export interface BlocklyEditorHandle {
   highlightBlock: (id: string | null) => void;
   countBlocks: () => number;
   resetWorkspace: () => void;
+  /** Replaces the workspace's contents with a "Show Solution" block tree
+   * (content/solutionCompiler.ts's output) — Blockly's own JSON
+   * serialization format, not this app's XML starting-workspace format. */
+  loadSolutionJson: (json: object) => void;
 }
 
 interface BlocklyEditorProps {
@@ -189,6 +193,12 @@ export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>
     countBlocks: () => workspaceRef.current?.getAllBlocks(false).length ?? 0,
     resetWorkspace: () => {
       workspaceRef.current?.clear();
+    },
+    loadSolutionJson: (json: object) => {
+      const ws = workspaceRef.current;
+      if (!ws) return;
+      ws.clear();
+      Blockly.serialization.workspaces.load(json, ws);
     },
   }));
 

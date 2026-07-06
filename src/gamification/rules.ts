@@ -14,6 +14,13 @@ export function calculateXp(stars: 0 | 1 | 2 | 3): number {
   return XP_RULES.base + (stars - 1) * XP_RULES.perStarBonus;
 }
 
+/** XP cost to unlock the hint at `index` (0-based) — escalating, so the
+ * first peek is cheap but leaning on every hint adds up. Roughly half a
+ * level's worth of XP for the first hint, matching `calculateXp`'s scale. */
+export function hintCost(index: number): number {
+  return (index + 1) * 5;
+}
+
 export interface BadgeRule {
   id: string;
   descriptionKey: string;

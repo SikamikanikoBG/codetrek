@@ -3,39 +3,83 @@
   "concepts": {
     "sequence": {
       "title": "Step by Step",
-      "explain": "A program runs its blocks one after another, in order — just like following a recipe. Each step waits its turn."
+      "steps": [
+        "Drag blocks into the workspace one at a time.",
+        "Blockly connects them in a chain — the top block runs first.",
+        "Press Run and watch each block light up in the order it runs."
+      ]
     },
     "turn": {
       "title": "Turning",
-      "explain": "A 'turn' block spins your robot to face a new direction without moving it forward. Mix turns with moves to travel any path."
+      "steps": [
+        "Drag a 'turn left' or 'turn right' block below your last block.",
+        "Turning doesn't move the robot — it only changes which way it's facing.",
+        "Add a 'move forward' block right after it to actually travel in the new direction."
+      ]
     },
     "loop": {
       "title": "Repeat Blocks",
-      "explain": "Instead of copying the same block again and again, a 'repeat' block runs everything inside it a set number of times. Fewer blocks, same result!"
+      "steps": [
+        "Drag a 'repeat' block into your workspace.",
+        "Type how many times it should repeat — like 3, or 10.",
+        "Drag the block you want to repeat (like 'move forward') INSIDE the repeat block.",
+        "One repeat block now does the work of many separate blocks — try putting a turn inside it too!"
+      ]
     },
     "conditional": {
       "title": "Making Choices",
-      "explain": "An 'if' block checks something first — like whether the path ahead is clear — and only runs its blocks when that's true."
+      "steps": [
+        "Drag an 'if' block into your workspace.",
+        "Drop 'path ahead clear?' into the if block's checking slot.",
+        "Put 'move forward' inside the if — it only runs when the path is really clear.",
+        "Click the if block's gear icon to add an 'else' — that's what happens when the path is NOT clear, like turning instead."
+      ]
     },
     "variable": {
       "title": "Remembering Numbers",
-      "explain": "A variable is a labeled box that holds a number you can reuse. Set it once, then use it anywhere — change the box, and everything using it updates too."
+      "steps": [
+        "Open the Variables drawer and make a new variable, like \"steps\".",
+        "Drag a 'set steps to' block in and type a number.",
+        "Now drag the \"steps\" variable itself into a repeat block's number slot, instead of typing a number.",
+        "Change the variable's value once, and everywhere you used it updates automatically."
+      ]
     },
     "obstacleAvoidance": {
       "title": "Watching for Walls",
-      "explain": "Check whether the path ahead is clear before moving. If it isn't, turn instead of crashing — planning ahead beats guessing."
+      "steps": [
+        "Before moving into a new cell, check 'path ahead clear?' with an if block.",
+        "If it's clear, 'move forward' like normal.",
+        "If it's not clear, turn instead of crashing — try putting 'turn right' in the else.",
+        "Combine this with a repeat block to keep checking and moving all the way to the goal."
+      ]
     }
   },
   "nudge": {
     "idle": "Not sure where to start? Drag a block into the workspace and press Run — you can always try again!",
-    "hintIntro": "Here's a hint:",
+    "hintIntro": "I've got a hint for this level — check the hints panel below. Hints cost a little XP, like buying a clue.",
     "genericHint": "Try changing the order of your blocks, or how many times a loop repeats.",
-    "explainOffer": "This level is all about {{concept}}. Want me to explain how it works?",
-    "explainCta": "Explain {{concept}}",
-    "hintsCta": "Show more hints",
+    "explainOffer": "This level is all about {{concept}}. Want me to walk you through it, step by step?",
+    "explainCta": "Show me how ({{concept}})",
+    "hintsCta": "Show hints panel",
     "newSkillTitle": "New skill: {{concept}}",
     "newSkillCta": "Got it, let's go!",
     "dismiss": "Maybe later",
     "closeExplain": "Thanks, Buddy!"
+  },
+  "solution": {
+    "title": "How to Solve This Level",
+    "intro": "Here's one way to solve it, step by step — I'll build it in your workspace so you can see exactly how the pieces fit together.",
+    "buildButton": "Build This For Me",
+    "buildConfirm": "This will replace whatever's in your workspace right now — build the solution anyway?",
+    "closeButton": "Got it, thanks!",
+    "actionForward": "Move forward one step.",
+    "actionTurnLeft": "Turn left.",
+    "actionTurnRight": "Turn right.",
+    "actionSetVariable": "Set the variable \"{{name}}\" to {{value}} — like writing a number on a sticky note to use later.",
+    "repeatNumber": "Repeat {{count}} times:",
+    "repeatVariable": "Repeat as many times as \"{{name}}\" says:",
+    "ifCondition": "Check: is the path ahead clear?",
+    "ifThen": "Yes, it's clear →",
+    "ifElse": "No, something's in the way →"
   }
 }

@@ -12,6 +12,23 @@ import type { ReactNode } from 'react';
 import { getConceptInfo } from '../content/concepts';
 import { useTranslation } from 'react-i18next';
 
+/** Renders a concept's "how to use this block" steps as a numbered list —
+ * deliberately several concrete steps rather than one summary sentence, so
+ * a stuck parent (per feedback: "even for me the variables are hard to
+ * understand") gets something to actually try, not just a definition. */
+export function ConceptSteps({ stepsKey }: { stepsKey: string }) {
+  const { t } = useTranslation('buddy');
+  const steps = t(stepsKey, { returnObjects: true }) as unknown as string[];
+  if (!Array.isArray(steps)) return null;
+  return (
+    <ol className="concept-steps">
+      {steps.map((step, i) => (
+        <li key={i}>{step}</li>
+      ))}
+    </ol>
+  );
+}
+
 export type BuddyMood = 'idle' | 'thinking' | 'happy' | 'curious';
 
 interface BuddyMascotProps {
@@ -95,7 +112,7 @@ export function Buddy({ mood, message, conceptId, actions, onDismiss, variant = 
             ×
           </button>
         )}
-        <p className="buddy__message">{message}</p>
+        <div className="buddy__message">{message}</div>
         {concept && <ConceptDemo glyphs={concept.demoGlyphs} />}
         {actions && actions.length > 0 && (
           <div className="buddy__actions">

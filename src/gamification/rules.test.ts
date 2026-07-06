@@ -8,6 +8,7 @@ import {
   RANKS,
   getWorldCompletion,
   getRecentActivity,
+  hintCost,
 } from './rules';
 import type { Level } from '../content/types';
 import type { Profile } from '../storage/localStorage';
@@ -258,5 +259,13 @@ describe('getRecentActivity', () => {
       },
     });
     expect(getRecentActivity(profile, levels, 1)).toHaveLength(1);
+  });
+});
+
+describe('hintCost', () => {
+  it('escalates with each successive hint', () => {
+    expect(hintCost(0)).toBe(5);
+    expect(hintCost(1)).toBe(10);
+    expect(hintCost(2)).toBe(15);
   });
 });
