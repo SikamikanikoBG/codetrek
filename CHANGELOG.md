@@ -3,6 +3,16 @@
 All notable changes to CodeTrek are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.0.1] - 2026-07-06
+
+### Fixed
+- A brand-new profile (0 XP, nothing completed yet) never reached the
+  server until its first level completion or language change — creating a
+  profile now pushes it immediately, same as every other mutation. Caught
+  by an end-to-end check against production: registering, creating a
+  profile, and signing in from a second browser didn't show the profile
+  until a reload was thrown in.
+
 ## [1.0.0] - 2026-07-06
 
 ### Added
