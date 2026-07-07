@@ -1,0 +1,20 @@
+{
+  "id": "w4-l10",
+  "worldId": "world-4",
+  "order": 10,
+  "tier": "block-text",
+  "scenario": "robot-grid",
+  "titleKey": "levels:w4-l10.title",
+  "toolboxRef": "block-text",
+  "goal": {
+    "gridWidth": 12,
+    "gridHeight": 1,
+    "start": { "x": 0, "y": 0 },
+    "startDirection": "east",
+    "target": { "x": 11, "y": 0 }
+  },
+  "starRules": { "threeStar": { "maxBlocks": 4 } },
+  "concepts": ["variable", "loop"],
+  "hints": ["levels:w4-l10.hint1", "levels:w4-l10.hint2"],
+  "visualStyle": "game-builder"
+}

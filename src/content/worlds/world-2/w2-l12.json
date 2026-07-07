@@ -1,10 +1,10 @@
 {
-  "id": "w1-l12",
-  "worldId": "world-1",
+  "id": "w2-l12",
+  "worldId": "world-2",
   "order": 12,
   "tier": "block-text",
   "scenario": "robot-grid",
-  "titleKey": "levels:w1-l12.title",
+  "titleKey": "levels:w2-l12.title",
   "toolboxRef": "block-text",
   "goal": {
     "gridWidth": 8,
@@ -24,6 +24,6 @@
   },
   "starRules": { "threeStar": { "maxBlocks": 12 } },
   "concepts": ["loop", "conditional", "variable"],
-  "hints": ["levels:w1-l12.hint1", "levels:w1-l12.hint2"],
+  "hints": ["levels:w2-l12.hint1", "levels:w2-l12.hint2"],
   "visualStyle": "pov"
 }

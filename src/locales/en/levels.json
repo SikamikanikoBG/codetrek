@@ -1,7 +1,9 @@
 {
   "worlds": {
     "world-1": { "title": "Robots" },
-    "world-2": { "title": "AI Lab" }
+    "world-2": { "title": "AI Lab" },
+    "world-3": { "title": "Computers" },
+    "world-4": { "title": "Building Games" }
   },
   "w1-l05": {
     "title": "Loop It!",
@@ -72,5 +74,100 @@
     "title": "The Big Dataset",
     "hint1": "Use everything you've learned: loops, sensor checks, and variables.",
     "hint2": "Plan your scan path in sections before placing blocks."
+  },
+  "w2-l10": {
+    "title": "The Long Scan",
+    "hint1": "A bigger variable means a longer scan — no extra blocks needed.",
+    "hint2": "Set your variable once, then reuse it."
+  },
+  "w2-l11": {
+    "title": "Signal Interference",
+    "hint1": "Break the course into short repeat-and-check segments.",
+    "hint2": "Turn only when the sensor path ahead isn't clear."
+  },
+  "w2-l12": {
+    "title": "The Final Dataset",
+    "hint1": "Use everything you've learned: loops, sensor checks, and variables.",
+    "hint2": "Plan your scan path in sections before you start placing blocks."
+  },
+  "w3-l05": {
+    "title": "Copy the Files",
+    "hint1": "Copying the same file over and over? There's a block for that.",
+    "hint2": "Try a 'repeat' block with 'move forward' inside it."
+  },
+  "w3-l06": {
+    "title": "Update the Software",
+    "hint1": "Combine turning and moving inside your repeat block.",
+    "hint2": "Think about how many times you need to repeat the install pattern."
+  },
+  "w3-l07": {
+    "title": "Set the Memory Size",
+    "hint1": "A variable can hold how much memory to use.",
+    "hint2": "Set a variable, then use it inside your repeat block."
+  },
+  "w3-l08": {
+    "title": "Squash the Bug",
+    "hint1": "Use 'path ahead clear?' inside an if-block before you move.",
+    "hint2": "If a bug is blocking the path, try routing around it instead."
+  },
+  "w3-l09": {
+    "title": "Scan for Viruses",
+    "hint1": "Combine a repeat block with an if-block to check every file.",
+    "hint2": "Check if the path is clear before scanning each new file."
+  },
+  "w3-l10": {
+    "title": "Long Download",
+    "hint1": "A bigger variable means a longer download — no extra blocks needed.",
+    "hint2": "Set your variable once, then reuse it."
+  },
+  "w3-l11": {
+    "title": "Dodge the Bugs",
+    "hint1": "Break the repair job into short repeat-and-check segments.",
+    "hint2": "Turn only when a bug is blocking the path ahead."
+  },
+  "w3-l12": {
+    "title": "Reboot the System",
+    "hint1": "Use everything you've learned: loops, if-checks, and variables.",
+    "hint2": "Plan your repair route in sections before you start placing blocks."
+  },
+  "w4-l05": {
+    "title": "Loop the Level",
+    "hint1": "Doing the same jump again and again? There's a block for that.",
+    "hint2": "Try a 'repeat' block with 'move forward' inside it."
+  },
+  "w4-l06": {
+    "title": "The Patrol Loop",
+    "hint1": "Combine turning and moving inside your repeat block.",
+    "hint2": "Think about how many times the patrol pattern repeats."
+  },
+  "w4-l07": {
+    "title": "Set the High Score Goal",
+    "hint1": "A variable can hold how many points you need.",
+    "hint2": "Set a variable, then use it inside your repeat block."
+  },
+  "w4-l08": {
+    "title": "Avoid the Enemy",
+    "hint1": "Use 'path ahead clear?' inside an if-block before you move.",
+    "hint2": "If an enemy blocks the path, dodge around it instead."
+  },
+  "w4-l09": {
+    "title": "Enemy Alley",
+    "hint1": "Combine a repeat block with an if-block to get past every enemy.",
+    "hint2": "Check if the path is clear before moving forward each time."
+  },
+  "w4-l10": {
+    "title": "Speedrun Setup",
+    "hint1": "A bigger variable means a longer level — no extra blocks needed.",
+    "hint2": "Set your variable once, then reuse it."
+  },
+  "w4-l11": {
+    "title": "Boss Room",
+    "hint1": "Break the boss fight into short repeat-and-check segments.",
+    "hint2": "Turn only when the boss blocks the path ahead."
+  },
+  "w4-l12": {
+    "title": "Build the Final Level",
+    "hint1": "Use everything you've learned: loops, if-checks, and variables.",
+    "hint2": "Plan your level layout in sections before you start placing blocks."
   }
 }

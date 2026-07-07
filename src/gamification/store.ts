@@ -62,6 +62,10 @@ export interface LevelAttempt {
   blocksUsed: number;
   movesUsed: number;
   timeSeconds: number;
+  /** True when this run was produced by "Build This For Me" rather than the
+   * kid's own solution. Forces 0 stars/XP and blocks badge credit for this
+   * attempt (see recordLevelCompletion). */
+  assisted: boolean;
 }
 
 export interface CompletionResult {
@@ -69,6 +73,9 @@ export interface CompletionResult {
   xpAwarded: number;
   stars: 0 | 1 | 2 | 3;
   newBadges: string[];
+  /** Whether the level's progress entry is (still) flagged assisted after
+   * this attempt — see the precedence rule in recordLevelCompletion. */
+  assisted: boolean;
 }
 
 /** Records a successful level attempt: updates progress/stars/best-attempt, awards XP (once, on first completion), evaluates new badges. Returns null for a losing attempt or unknown profile. */
@@ -84,23 +91,45 @@ export function recordLevelCompletion(
   const profile = store.profiles.find((p) => p.id === profileId);
   if (!profile) return null;
 
-  const stars = calculateStars(attempt.blocksUsed, attempt.movesUsed, level.starRules as StarRules);
+  // An assisted ("Build This For Me") run never earns real stars — skip
+  // calculateStars entirely rather than let blocksUsed/movesUsed produce a
+  // real-looking star count for a level the kid didn't actually solve.
+  const stars: 0 | 1 | 2 | 3 = attempt.assisted
+    ? 0
+    : calculateStars(attempt.blocksUsed, attempt.movesUsed, level.starRules as StarRules);
   const existing = profile.progress[level.id];
   const bestStars = existing && existing.stars > stars ? existing.stars : stars;
-  const isFirstCompletion = existing?.status !== 'completed';
+  // XP is awarded once, on the first GENUINE completion — not merely the
+  // first completion ever. An assisted run already marks status 'completed'
+  // (so the level unlocks the next one / shows as seen on the world map),
+  // but it must not consume the "first completion" XP slot: a kid who later
+  // solves the same level for real still deserves real XP. `existing.assisted`
+  // absent (pre-existing saved profiles from before this field existed) is
+  // treated as falsy/genuine, same migration-safety rule as elsewhere.
+  const isFirstGenuineCompletion = existing?.status !== 'completed' || existing?.assisted === true;
   const bestAttempt =
     existing?.bestAttempt && existing.bestAttempt.blocksUsed <= attempt.blocksUsed
       ? existing.bestAttempt
       : { blocksUsed: attempt.blocksUsed, timeSeconds: attempt.timeSeconds };
+  // Once a level has been genuinely completed for real, a later assisted
+  // rerun must never flip it back to assisted. "Genuine" means assisted is
+  // NOT strictly true — this must also cover profiles saved before the
+  // `assisted` field existed (status 'completed', assisted undefined), not
+  // just an explicit `assisted: false`, or a pre-existing 3-star completion
+  // would get silently reclassified as assisted (and dropped from every
+  // badge count) the moment "Build This For Me" is used on it again.
+  const wasGenuine = existing?.status === 'completed' && existing.assisted !== true;
+  const nextAssisted = wasGenuine ? false : attempt.assisted;
 
   profile.progress[level.id] = {
     status: 'completed',
     stars: bestStars,
     bestAttempt,
     completedAt: new Date().toISOString(),
+    assisted: nextAssisted,
   };
 
-  const xpAwarded = isFirstCompletion ? calculateXp(bestStars) : 0;
+  const xpAwarded = isFirstGenuineCompletion ? calculateXp(bestStars) : 0;
   profile.xp += xpAwarded;
 
   const newBadges = evaluateNewBadges(profile, allLevels);
@@ -108,7 +137,7 @@ export function recordLevelCompletion(
 
   writeStore(store);
   notifyProfileChanged(profile);
-  return { profile, xpAwarded, stars: bestStars, newBadges };
+  return { profile, xpAwarded, stars: bestStars, newBadges, assisted: nextAssisted };
 }
 
 /** Marks the given concept ids as introduced for this profile so Buddy's

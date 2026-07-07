@@ -1,0 +1,20 @@
+{
+  "id": "w4-l06",
+  "worldId": "world-4",
+  "order": 6,
+  "tier": "block-text",
+  "scenario": "robot-grid",
+  "titleKey": "levels:w4-l06.title",
+  "toolboxRef": "block-text",
+  "goal": {
+    "gridWidth": 5,
+    "gridHeight": 5,
+    "start": { "x": 0, "y": 0 },
+    "startDirection": "east",
+    "target": { "x": 4, "y": 4 }
+  },
+  "starRules": { "threeStar": { "maxBlocks": 5 } },
+  "concepts": ["loop", "turn"],
+  "hints": ["levels:w4-l06.hint1", "levels:w4-l06.hint2"],
+  "visualStyle": "game-builder"
+}

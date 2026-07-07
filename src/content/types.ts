@@ -7,6 +7,12 @@ export type Tier = 'icon' | 'block-text' | 'python'; // 'python' unused until Ph
 
 export type Scenario = 'robot-grid' | 'turtle-draw' | 'sorting'; // only 'robot-grid' implemented in MVP
 
+/** Which scenario renderer draws the right-hand panel. Engine/goal/solution
+ * stay identical across styles — this is presentation only. 'top-down' (the
+ * original bird's-eye grid) is the default when omitted, so every level
+ * authored before this field existed keeps rendering exactly as before. */
+export type VisualStyle = 'top-down' | 'pov' | 'game-builder';
+
 export type Direction = 'north' | 'east' | 'south' | 'west';
 
 export interface GridCell {
@@ -43,6 +49,8 @@ export interface Level {
   starRules: StarRules;
   concepts: string[];
   hints: string[];
+  /** Defaults to 'top-down' when omitted. */
+  visualStyle?: VisualStyle;
 }
 
 export interface World {

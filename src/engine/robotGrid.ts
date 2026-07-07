@@ -13,7 +13,7 @@ export interface RobotState {
 
 const DIRECTION_ORDER: Direction[] = ['north', 'east', 'south', 'west'];
 
-const DIRECTION_DELTA: Record<Direction, { dx: number; dy: number }> = {
+export const DIRECTION_DELTA: Record<Direction, { dx: number; dy: number }> = {
   north: { dx: 0, dy: -1 },
   east: { dx: 1, dy: 0 },
   south: { dx: 0, dy: 1 },

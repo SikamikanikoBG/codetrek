@@ -3,6 +3,44 @@
 All notable changes to CodeTrek are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.0] - 2026-07-07
+
+### Added
+- **Two new Worlds: Computers and Building Games**, each with 12 levels
+  (12/12/12/12 across all four Worlds now, up from 12/9 — 48 levels total,
+  more than double v1.1.0's 21). Computers reskins the same concept
+  progression around OS/hardware/software (🖱️ cursor, 🐛 bugs to route
+  around, 💾 save-target); Building Games frames it as assembling a small
+  arcade game (🦸 player sprite, 👾 enemies, 🏆 trophy, a live SCORE HUD).
+  World-2 (AI Lab) also grew from 9 to 12 levels for parity.
+- **Scenario visual styles.** The right-hand panel now varies by level
+  (`Level.visualStyle`) while the left-hand Blockly editor and the
+  underlying goal/solution engine never change: `top-down` (the original
+  bird's-eye grid, still the default), `pov` (a first-person corridor view,
+  used on the last two levels of Robots/AI Lab/Computers for a change of
+  pace on the "advanced" puzzles), and `game-builder` (Building Games'
+  signature arcade-screen look, used throughout that World).
+- **Level Complete modal.** The old inline completion panel is now a real
+  popup modal (matching the app's existing dialog pattern) — the whole card
+  scales+fades in, then the stars pop in sequence, confetti bursts behind
+  it, one focal "+XP" line replaces the separate corner toast.
+
+### Fixed
+- **"Build This For Me" no longer earns real stars/XP/badges.** Using the
+  auto-solution now always completes the level with 0 stars/0 XP and no
+  badge credit, shown via a distinct "Solved with help" modal (muted
+  stars, no confetti) instead of the normal celebration — resetting and
+  solving it for real still earns full credit, and a level already
+  genuinely completed can never be reclassified as assisted by a later
+  "Build This For Me" rerun. (This closes a real gap where even the first
+  fix attempt still mis-scored the very first "Build This For Me" per level
+  as genuine, due to a stale-closure timing bug — caught by an adversarial
+  review pass and confirmed fixed against the running app.)
+- Fixed a latent bug where the "World 1/2 Complete" badge-earned toast
+  rendered a broken i18n key (`world-1Complete` instead of `world1Complete`)
+  due to a hyphen-before-a-digit edge case in the badge-id → i18n-key
+  conversion.
+
 ## [1.1.0] - 2026-07-06
 
 ### Added

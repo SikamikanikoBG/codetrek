@@ -14,7 +14,7 @@ const DIRECTION_ROTATION: Record<RobotState['direction'], number> = {
   west: 270,
 };
 
-interface RobotGridCanvasProps {
+export interface RobotGridCanvasProps {
   goal: RobotGridGoal;
   robotState: RobotState;
   /** Glyph overrides let a World reskin the scenario narratively (e.g. AI
@@ -22,6 +22,7 @@ interface RobotGridCanvasProps {
   robotGlyph?: string;
   crashGlyph?: string;
   targetGlyph?: string;
+  obstacleGlyph?: string;
 }
 
 export function RobotGridCanvas({
@@ -30,6 +31,7 @@ export function RobotGridCanvas({
   robotGlyph = '\u{1F916}',
   crashGlyph = '\u{1F4A5}',
   targetGlyph = '\u{1F3C1}',
+  obstacleGlyph,
 }: RobotGridCanvasProps) {
   const width = goal.gridWidth * CELL;
   const height = goal.gridHeight * CELL;
@@ -56,6 +58,13 @@ export function RobotGridCanvas({
         cells.push(
           <text key={`flag-${x}-${y}`} x={x * CELL + CELL / 2} y={y * CELL + CELL / 2 + 8} className="grid-flag">
             {targetGlyph}
+          </text>,
+        );
+      }
+      if (isObstacle && obstacleGlyph) {
+        cells.push(
+          <text key={`obstacle-${x}-${y}`} x={x * CELL + CELL / 2} y={y * CELL + CELL / 2 + 8} className="grid-obstacle-glyph">
+            {obstacleGlyph}
           </text>,
         );
       }

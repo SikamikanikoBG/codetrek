@@ -8,6 +8,10 @@ import { useEffect, useRef } from 'react';
 interface ConfettiBurstProps {
   /** Change this to any new value (e.g. the level id) to fire a fresh burst. */
   burstKey: string | number;
+  /** Extra class(es) appended to the canvas — e.g. a fullscreen modifier so
+   * the burst reads as "bursting behind the celebration modal" rather than
+   * confined to the small scenario canvas. */
+  className?: string;
 }
 
 interface Particle {
@@ -30,7 +34,7 @@ function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export function ConfettiBurst({ burstKey }: ConfettiBurstProps) {
+export function ConfettiBurst({ burstKey, className }: ConfettiBurstProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -95,5 +99,11 @@ export function ConfettiBurst({ burstKey }: ConfettiBurstProps) {
     return () => cancelAnimationFrame(raf);
   }, [burstKey]);
 
-  return <canvas ref={canvasRef} className="confetti-burst" aria-hidden="true" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className={className ? `confetti-burst ${className}` : 'confetti-burst'}
+      aria-hidden="true"
+    />
+  );
 }

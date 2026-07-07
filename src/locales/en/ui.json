@@ -2,7 +2,8 @@
   "levelStatus": {
     "locked": "Locked",
     "unlocked": "Ready to play",
-    "completed": "Completed"
+    "completed": "Completed",
+    "assistedBadge": "Solved with help — no stars yet"
   },
   "xpToast": "+{{xp}} XP!",
   "starsEarned_one": "{{count}} star earned",
@@ -15,7 +16,15 @@
     "variableWizard": "Variable Wizard — complete a level using a variable",
     "perfectionist": "Perfectionist — earn 3 stars on 5 levels",
     "world1Complete": "Robots Complete — finish every level in the Robots world",
-    "world2Complete": "AI Lab Complete — finish every level in the AI Lab world"
+    "world2Complete": "AI Lab Complete — finish every level in the AI Lab world",
+    "world3Complete": "Computers Complete — finish every level in the Computers world",
+    "world4Complete": "Game Builder Complete — finish every level in the Building Games world"
+  },
+  "completionModal": {
+    "title": "Level Complete! 🎉",
+    "titleAssisted": "Solved with help",
+    "xpEarned": "+{{xp}} XP!",
+    "assistedBody": "Buddy built this one for you, so it's not counted as a real win yet — no stars, no XP. Reset the level and solve it yourself to earn real credit!"
   },
   "ranks": {
     "newRecruit": "New Recruit",

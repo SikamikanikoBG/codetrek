@@ -109,16 +109,27 @@ export interface BlocklyEditorHandle {
 interface BlocklyEditorProps {
   toolboxRef: ToolboxRef;
   startingWorkspace?: string;
+  /** Fires on any REAL block-content change (add/delete/move/field edit) —
+   * never for UI-only events (selection, viewport/zoom/scroll) and never for
+   * a programmatic `loadSolutionJson`/`loadWorkspaceXml`/`resetWorkspace`
+   * call (those are wrapped in Blockly.Events.disable()/enable() so they
+   * never reach this listener at all). Callers use this as the "the kid
+   * actually touched the blocks themselves" signal — e.g. to clear a
+   * "this workspace is just the auto-built solution" flag the moment it
+   * stops being true. */
+  onWorkspaceChange?: () => void;
 }
 
 export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>(function BlocklyEditor(
-  { toolboxRef, startingWorkspace },
+  { toolboxRef, startingWorkspace, onWorkspaceChange },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const startingWorkspaceRef = useRef(startingWorkspace);
   startingWorkspaceRef.current = startingWorkspace;
+  const onWorkspaceChangeRef = useRef(onWorkspaceChange);
+  onWorkspaceChangeRef.current = onWorkspaceChange;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -135,6 +146,12 @@ export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>
       grid: { spacing: 24, length: 2, colour: readColorToken('--border', '#d7ddd3'), snap: true },
     });
     workspaceRef.current = workspace;
+
+    const handleWorkspaceEvent = (event: Blockly.Events.Abstract) => {
+      if (event.isUiEvent) return;
+      onWorkspaceChangeRef.current?.();
+    };
+    workspace.addChangeListener(handleWorkspaceEvent);
 
     // Re-resolve and re-apply the theme when the OS light/dark preference
     // flips, since the colors above are resolved once at inject time (they
@@ -157,6 +174,7 @@ export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>
 
     return () => {
       darkModeQuery.removeEventListener('change', handleColorSchemeChange);
+      workspace.removeChangeListener(handleWorkspaceEvent);
       workspace.dispose();
       if (workspaceRef.current === workspace) workspaceRef.current = null;
     };
@@ -197,8 +215,18 @@ export const BlocklyEditor = forwardRef<BlocklyEditorHandle, BlocklyEditorProps>
     loadSolutionJson: (json: object) => {
       const ws = workspaceRef.current;
       if (!ws) return;
-      ws.clear();
-      Blockly.serialization.workspaces.load(json, ws);
+      // Suppress events for this programmatic load — it must never be
+      // mistaken for "the kid touched the blocks" by onWorkspaceChange
+      // (which is exactly what marks an assisted run's blocks as no longer
+      // assisted). A REAL subsequent edit still fires normally once events
+      // are re-enabled.
+      Blockly.Events.disable();
+      try {
+        ws.clear();
+        Blockly.serialization.workspaces.load(json, ws);
+      } finally {
+        Blockly.Events.enable();
+      }
     },
   }));
 

@@ -393,6 +393,13 @@
   font-weight: 700;
 }
 
+/* Assisted ("Build This For Me") completion — deliberately muted vs. the
+   success-green earned badge, still paired with a distinct icon rather than
+   color alone (DESIGN.md colorblind-safe rule). */
+.level-tile__badge--assisted {
+  color: var(--muted);
+}
+
 .level-tile__badge--locked {
   font-size: 1rem;
 }
@@ -512,6 +519,12 @@
   text-anchor: middle;
 }
 
+.grid-obstacle-glyph {
+  font-size: 26px;
+  text-anchor: middle;
+  opacity: 0.85;
+}
+
 .grid-robot {
   font-size: 34px;
   text-anchor: middle;
@@ -519,6 +532,128 @@
 
 .grid-robot--crashed {
   font-size: 30px;
+}
+
+/* ---------- POV scenario renderer (DESIGN.md "Scenario visual styles") ---------- */
+
+.pov-grid-canvas {
+  width: 100%;
+  max-height: 60vh;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 2px solid var(--border);
+}
+
+.pov-ceiling,
+.pov-floor {
+  fill: var(--surface-raised);
+}
+
+.pov-wall-left,
+.pov-wall-right {
+  fill: var(--border);
+  opacity: 0.6;
+}
+
+.pov-ring {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.pov-wall-block {
+  fill: var(--danger);
+  opacity: 0.35;
+}
+
+.pov-obstacle-glyph {
+  font-size: 30px;
+  text-anchor: middle;
+}
+
+.pov-target-glyph {
+  text-anchor: middle;
+  fill: var(--success);
+  filter: drop-shadow(0 0 6px var(--success));
+}
+
+.pov-crash-glyph {
+  font-size: 64px;
+  text-anchor: middle;
+  fill: var(--danger);
+}
+
+/* ---------- Game Builder scenario renderer (Building Games World's signature look) ---------- */
+
+.game-builder-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--world-games-tint, var(--surface-raised));
+  border: 3px solid var(--world-games-border, var(--border));
+  border-radius: 18px;
+  padding: 10px;
+}
+
+.game-builder-canvas__hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  padding: 0 6px;
+}
+
+.game-builder-canvas__hud-clear {
+  color: var(--success);
+}
+
+.game-builder-canvas__screen {
+  width: 100%;
+  max-height: 55vh;
+  background: var(--surface);
+  border-radius: 10px;
+  border: 2px solid var(--border);
+}
+
+.gb-cell {
+  fill: transparent;
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.gb-cell--obstacle {
+  fill: var(--danger);
+  opacity: 0.3;
+}
+
+.gb-cell--target {
+  fill: var(--success);
+  opacity: 0.18;
+}
+
+.gb-target-glyph {
+  font-size: 26px;
+  text-anchor: middle;
+}
+
+.gb-obstacle-glyph {
+  font-size: 24px;
+  text-anchor: middle;
+  opacity: 0.85;
+}
+
+.gb-player {
+  font-size: 30px;
+  text-anchor: middle;
+}
+
+.gb-player--crashed {
+  font-size: 28px;
 }
 
 .level-play__controls {
@@ -571,20 +706,9 @@
   text-align: left;
 }
 
-/* Level-complete panel: persistent celebration card (stars + badges + next
-   level CTA). Confetti (canvas, over the scenario) and the XP toast
-   (auto-dismissing) are separate, transient motion layered alongside it. */
-.level-complete-panel {
-  border: 1px solid var(--success);
-  background: color-mix(in oklch, var(--success) 12%, var(--surface-raised));
-  border-radius: 16px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
-}
-
+/* Stars row + badge lines are reused verbatim inside LevelCompleteModal's
+   `.modal-card` — the old standalone `.level-complete-panel` wrapper is gone
+   (superseded by the modal), but these two classes still apply. */
 .level-complete-panel__stars {
   font-size: 1.75rem;
   display: flex;
@@ -1141,6 +1265,60 @@
 
 .modal-card h2 {
   margin-top: 0;
+}
+
+/* Level-complete modal: the whole card scales+fades in (DESIGN.md
+   "Level-complete modal" motion spec) — ease-out-quart, no bounce, same
+   curve family as star-pop. Only the genuine (non-assisted) completion uses
+   this; an assisted completion keeps the plain modal-card with no special
+   entrance, since it must never read as the full celebration. */
+.modal-card--celebrate {
+  animation: modal-celebrate-in 340ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes modal-celebrate-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.completion-modal__xp {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--accent);
+}
+
+.completion-modal__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* Confetti behind the celebration modal: a fixed full-viewport layer,
+   rendered INSIDE .modal-backdrop before .modal-card (LevelCompleteModal.tsx)
+   so its z-index is compared against the card within that same stacking
+   context (DESIGN.md Motion — "bursting behind the celebration card"),
+   instead of confined to the small scenario canvas. A fixed element's
+   z-index only ever competes against siblings in its own stacking context —
+   rendering this outside .modal-backdrop would make it paint over the
+   entire backdrop+card unit no matter what z-index the card had. */
+.confetti-burst--fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
 }
 
 .solution-panel {

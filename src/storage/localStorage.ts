@@ -9,6 +9,12 @@ export interface ProfileProgressEntry {
   stars: 0 | 1 | 2 | 3;
   bestAttempt?: { blocksUsed: number; timeSeconds: number };
   completedAt?: string;
+  /** True when this level's completion came from "Build This For Me" rather
+   * than the kid's own solution — such a completion earns 0 stars/XP/badges.
+   * Optional for the same migration-safety reason as seenConcepts/
+   * purchasedHints: profiles saved before this field existed just treat it
+   * as falsy (a genuine completion), never crash. */
+  assisted?: boolean;
 }
 
 export interface DailyChallengeState {

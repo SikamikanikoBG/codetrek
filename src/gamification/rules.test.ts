@@ -166,6 +166,64 @@ describe('evaluateNewBadges', () => {
     expect(evaluateNewBadges(profile, [])).not.toContain('world-1-complete');
     expect(evaluateNewBadges(profile, [])).not.toContain('world-2-complete');
   });
+
+  it('awards world3-complete and world4-complete only once every level in each World is completed', () => {
+    const levels = [
+      makeLevel({ id: 'w3-l01', worldId: 'world-3', order: 1 }),
+      makeLevel({ id: 'w3-l02', worldId: 'world-3', order: 2 }),
+      makeLevel({ id: 'w4-l01', worldId: 'world-4', order: 1 }),
+    ];
+    const partial = makeProfile({
+      progress: { 'w3-l01': { status: 'completed', stars: 2 } },
+    });
+    expect(evaluateNewBadges(partial, levels)).not.toContain('world3-complete');
+    expect(evaluateNewBadges(partial, levels)).not.toContain('world4-complete');
+
+    const complete = makeProfile({
+      progress: {
+        'w3-l01': { status: 'completed', stars: 2 },
+        'w3-l02': { status: 'completed', stars: 1 },
+        'w4-l01': { status: 'completed', stars: 3 },
+      },
+    });
+    const newBadges = evaluateNewBadges(complete, levels);
+    expect(newBadges).toContain('world3-complete');
+    expect(newBadges).toContain('world4-complete');
+  });
+
+  describe('assisted completions never count toward badges', () => {
+    it('an assisted-only completion does not earn first-steps — or any badge — even as the very first completion', () => {
+      const level = makeLevel({ id: 'w1-l01', concepts: ['sequence'] });
+      const profile = makeProfile({
+        progress: { 'w1-l01': { status: 'completed', stars: 0, assisted: true } },
+      });
+      expect(evaluateNewBadges(profile, [level])).toEqual([]);
+    });
+
+    it('does not count assisted completions toward loop-explorer, perfectionist, or a world-complete badge', () => {
+      const levels = [
+        makeLevel({ id: 'a', worldId: 'world-1', order: 1, concepts: ['loop'] }),
+        makeLevel({ id: 'b', worldId: 'world-1', order: 2, concepts: ['loop'] }),
+        makeLevel({ id: 'c', worldId: 'world-1', order: 3, concepts: ['loop'] }),
+      ];
+      // stars: 3 is unrealistic alongside assisted: true (recordLevelCompletion
+      // always forces stars to 0 for an assisted attempt) but exercises the
+      // badge rules' own `!entry.assisted` guard directly, independent of
+      // whatever the store guarantees elsewhere.
+      const profile = makeProfile({
+        progress: {
+          a: { status: 'completed', stars: 3, assisted: true },
+          b: { status: 'completed', stars: 3, assisted: true },
+          c: { status: 'completed', stars: 3, assisted: true },
+        },
+      });
+      const newBadges = evaluateNewBadges(profile, levels);
+      expect(newBadges).not.toContain('loop-explorer');
+      expect(newBadges).not.toContain('perfectionist');
+      expect(newBadges).not.toContain('world-1-complete');
+      expect(newBadges).not.toContain('first-steps');
+    });
+  });
 });
 
 describe('getRank (XP-derived rank/level label)', () => {

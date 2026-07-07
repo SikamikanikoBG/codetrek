@@ -27,25 +27,34 @@ export interface BadgeRule {
   check: (profile: Profile, levels: Level[]) => boolean;
 }
 
+// Every badge counts only genuinely-earned completions (`!entry.assisted`) —
+// an assisted ("Build This For Me") completion never contributes toward any
+// badge, including "first steps": a kid who only ever tapped the button
+// hasn't earned anything yet.
+
 function countCompletedWithConcept(profile: Profile, levels: Level[], concept: string): number {
   return levels.filter((l) => {
     const entry = profile.progress[l.id];
-    return entry?.status === 'completed' && l.concepts.includes(concept);
+    return entry?.status === 'completed' && !entry.assisted && l.concepts.includes(concept);
   }).length;
 }
 
 function countThreeStarLevels(profile: Profile): number {
-  return Object.values(profile.progress).filter((p) => p.status === 'completed' && p.stars === 3).length;
+  return Object.values(profile.progress).filter((p) => p.status === 'completed' && !p.assisted && p.stars === 3)
+    .length;
 }
 
 function countCompletedLevels(profile: Profile): number {
-  return Object.values(profile.progress).filter((p) => p.status === 'completed').length;
+  return Object.values(profile.progress).filter((p) => p.status === 'completed' && !p.assisted).length;
 }
 
 function isWorldComplete(profile: Profile, levels: Level[], worldId: string): boolean {
   const worldLevels = levels.filter((l) => l.worldId === worldId);
   if (worldLevels.length === 0) return false;
-  return worldLevels.every((l) => profile.progress[l.id]?.status === 'completed');
+  return worldLevels.every((l) => {
+    const entry = profile.progress[l.id];
+    return entry?.status === 'completed' && !entry.assisted;
+  });
 }
 
 export const BADGE_RULES: BadgeRule[] = [
@@ -83,6 +92,16 @@ export const BADGE_RULES: BadgeRule[] = [
     id: 'world-2-complete',
     descriptionKey: 'ui:badges.world2Complete',
     check: (profile, levels) => isWorldComplete(profile, levels, 'world-2'),
+  },
+  {
+    id: 'world3-complete',
+    descriptionKey: 'ui:badges.world3Complete',
+    check: (profile, levels) => isWorldComplete(profile, levels, 'world-3'),
+  },
+  {
+    id: 'world4-complete',
+    descriptionKey: 'ui:badges.world4Complete',
+    check: (profile, levels) => isWorldComplete(profile, levels, 'world-4'),
   },
 ];
 

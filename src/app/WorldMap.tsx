@@ -17,12 +17,14 @@ function LevelTile({
   level,
   status,
   stars,
+  assisted,
   tileIndex,
   onSelectLevel,
 }: {
   level: Level;
   status: 'locked' | 'unlocked' | 'completed';
   stars: 0 | 1 | 2 | 3;
+  assisted: boolean;
   tileIndex: number;
   onSelectLevel: (level: Level) => void;
 }) {
@@ -40,12 +42,23 @@ function LevelTile({
       title={t(`ui:levelStatus.${status}`)}
     >
       <span className="level-tile__order">{label}</span>
-      {status === 'completed' && (
-        <span className="level-tile__badge level-tile__badge--completed" aria-label={`${stars} stars`}>
-          {'✓ '}
-          {'⭐'.repeat(stars)}
-        </span>
-      )}
+      {status === 'completed' &&
+        (assisted ? (
+          // Solved via "Build This For Me" — never show star count here (a
+          // genuine completion always has 1-3 stars, so a bare "✓" would
+          // read as a bug rather than honestly as "seen with help").
+          <span
+            className="level-tile__badge level-tile__badge--completed level-tile__badge--assisted"
+            aria-label={t('ui:levelStatus.assistedBadge')}
+          >
+            {'✓🛟'}
+          </span>
+        ) : (
+          <span className="level-tile__badge level-tile__badge--completed" aria-label={`${stars} stars`}>
+            {'✓ '}
+            {'⭐'.repeat(stars)}
+          </span>
+        ))}
       {status === 'locked' && (
         <span className="level-tile__badge level-tile__badge--locked" aria-hidden="true">
           {'\u{1F512}'}
@@ -108,6 +121,7 @@ export function WorldMap({ profile, onSelectLevel, onSwitchProfile, onShowProgre
                 level={level}
                 status={statusMap[level.id] ?? 'locked'}
                 stars={profile.progress[level.id]?.stars ?? 0}
+                assisted={profile.progress[level.id]?.assisted ?? false}
                 tileIndex={index}
                 onSelectLevel={onSelectLevel}
               />

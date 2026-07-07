@@ -32,6 +32,8 @@
   /* World/domain identity colors — add one per new World, keep L 0.55-0.65 / C 0.15-0.19 */
   --world-robots: oklch(0.58 0.16 250);   /* blue */
   --world-ai: oklch(0.58 0.18 300);       /* violet */
+  --world-computers: oklch(0.60 0.15 195); /* cyan/teal */
+  --world-games: oklch(0.60 0.18 340);    /* magenta/pink */
 
   --shadow-sm: 0 2px 4px oklch(0.22 0.02 145 / 0.08);
   --shadow-md: 0 6px 16px oklch(0.22 0.02 145 / 0.12);
@@ -75,6 +77,7 @@ Colorblind-safe rule: locked/unlocked/completed and correct/incorrect states pai
 - Star earn: each star pops in sequence (not simultaneous) with a small overshoot-free scale (ease-out-back is too bouncy per the no-bounce rule — use ease-out-quart with a brief scale 0.8→1.05→1.0 via two-step transition, not a spring library).
 - XP toast: slides up from bottom (mobile) / in from the side (desktop), auto-dismiss with a progress-bar wipe.
 - Confetti/celebration on level-complete: canvas-based particle burst, respects `prefers-reduced-motion` (falls back to a static badge fade-in, no motion).
+- Level-complete modal: the whole card scales+fades in (0.85→1.02→1.0, ease-out-quart, no bounce — same curve family as star-pop) over the confetti/backdrop, THEN stars pop in sequence per the rule above. An assisted (solution-built) completion uses the same modal shell but swaps in muted/hollow stars and different copy — never the full celebration treatment, so a kid can't mistake "Buddy built it" for "I built it."
 - All motion wrapped in `@media (prefers-reduced-motion: reduce)` fallbacks — crossfade or instant.
 
 ## Components
@@ -83,6 +86,7 @@ Colorblind-safe rule: locked/unlocked/completed and correct/incorrect states pai
 - **World band**: full-width section per World, tinted with that world's identity color at ~8% opacity background + the world's icon/glyph, containing its level-tile grid.
 - **Level tile**: square, icon or emoji for icon-tier, icon+short label for block-tier; locked state shows a lock glyph (not just dimmed color); completed shows checkmark + star count as text "3★" not color alone.
 - **Progress view (new)**: per-profile stats — total XP with a level/rank derived from XP thresholds, badge gallery (earned vs. locked-silhouette for unearned), per-World completion bars (X/Y levels, stars collected out of max), simple recent-activity list (last N levels completed with date).
+- **Scenario visual styles**: the right-hand panel renderer varies by level (`Level.visualStyle`), while the left-hand Blockly editor and the underlying goal/solution engine never change. `top-down` (default) is the original bird's-eye grid; `pov` (used on the last couple of levels in a World, for variety on "advanced" puzzles) renders a first-person corridor view built from the same `RobotState`/`isBlocked` data; `game-builder` (the Building Games World's signature look throughout) frames the same grid as an arcade screen with a live score HUD. All three read the same World-level glyph reskin (`robotGlyph`/`crashGlyph`/`obstacleGlyph`/`targetGlyph` in `content/worldMeta.ts`).
 - **Blockly chrome**: keep Blockly's own canvas/toolbox untouched functionally; wrap it in a `--surface-raised` panel with `--border`, rounded corners matching the rest of the system (Blockly's own theme can be customized via its Theme API to use `--primary` for block category colors where sensible — don't fight Blockly's rendering, frame it).
 
 ## Anti-patterns to avoid (project-specific)

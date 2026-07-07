@@ -7,13 +7,15 @@ import { worlds, getAllLevels, getWorld, getLevel } from './manifest';
 // invariants (unique ids, valid gating order, schema rules per types.ts).
 
 describe('content manifest — world/level structure', () => {
-  it('ships at least two Worlds (Robots + AI Lab) for v0.2', () => {
-    expect(worlds.length).toBeGreaterThanOrEqual(2);
-    expect(worlds.map((w) => w.id)).toEqual(expect.arrayContaining(['world-1', 'world-2']));
+  it('ships at least four Worlds (Robots, AI Lab, Computers, Building Games)', () => {
+    expect(worlds.length).toBeGreaterThanOrEqual(4);
+    expect(worlds.map((w) => w.id)).toEqual(
+      expect.arrayContaining(['world-1', 'world-2', 'world-3', 'world-4']),
+    );
   });
 
-  it('ships 20+ levels total across all Worlds', () => {
-    expect(getAllLevels().length).toBeGreaterThanOrEqual(20);
+  it('ships 40+ levels total across all Worlds', () => {
+    expect(getAllLevels().length).toBeGreaterThanOrEqual(40);
   });
 
   it('every World has a comparable level count (8-12 levels)', () => {
@@ -36,8 +38,8 @@ describe('content manifest — world/level structure', () => {
     }
   });
 
-  it('Worlds are ordered Robots before AI Lab (per WORLD_META order)', () => {
-    expect(worlds.map((w) => w.id)).toEqual(['world-1', 'world-2']);
+  it('Worlds are ordered per WORLD_META order (Robots, AI Lab, Computers, Building Games)', () => {
+    expect(worlds.map((w) => w.id)).toEqual(['world-1', 'world-2', 'world-3', 'world-4']);
   });
 
   it("each World's levels are sorted by ascending order with no gaps in gating sequence", () => {

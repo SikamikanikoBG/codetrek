@@ -34,6 +34,12 @@
   --world-ai: oklch(0.58 0.18 300); /* violet */
   --world-ai-tint: oklch(0.93 0.035 300);
   --world-ai-border: oklch(0.72 0.10 300);
+  --world-computers: oklch(0.60 0.15 195); /* cyan/teal */
+  --world-computers-tint: oklch(0.93 0.03 195);
+  --world-computers-border: oklch(0.72 0.09 195);
+  --world-games: oklch(0.60 0.18 340); /* magenta/pink */
+  --world-games-tint: oklch(0.93 0.035 340);
+  --world-games-border: oklch(0.72 0.10 340);
 
   --shadow-sm: 0 2px 4px oklch(0.22 0.02 145 / 0.08);
   --shadow-md: 0 6px 16px oklch(0.22 0.02 145 / 0.12);
@@ -74,6 +80,10 @@
   --world-robots-border: oklch(0.55 0.13 250);
   --world-ai-tint: oklch(0.24 0.055 300);
   --world-ai-border: oklch(0.55 0.14 300);
+  --world-computers-tint: oklch(0.24 0.045 195);
+  --world-computers-border: oklch(0.55 0.12 195);
+  --world-games-tint: oklch(0.24 0.055 340);
+  --world-games-border: oklch(0.55 0.14 340);
 }
 
 /* prefers-color-scheme applies unless an explicit data-theme overrides it */
@@ -93,6 +103,10 @@
     --world-robots-border: oklch(0.55 0.13 250);
     --world-ai-tint: oklch(0.24 0.055 300);
     --world-ai-border: oklch(0.55 0.14 300);
+    --world-computers-tint: oklch(0.24 0.045 195);
+    --world-computers-border: oklch(0.55 0.12 195);
+    --world-games-tint: oklch(0.24 0.055 340);
+    --world-games-border: oklch(0.55 0.14 340);
   }
 }
 

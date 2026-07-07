@@ -1,10 +1,10 @@
 {
-  "id": "w1-l11",
-  "worldId": "world-1",
+  "id": "w3-l11",
+  "worldId": "world-3",
   "order": 11,
   "tier": "block-text",
   "scenario": "robot-grid",
-  "titleKey": "levels:w1-l11.title",
+  "titleKey": "levels:w3-l11.title",
   "toolboxRef": "block-text",
   "goal": {
     "gridWidth": 7,
@@ -21,6 +21,6 @@
   },
   "starRules": { "threeStar": { "maxBlocks": 10 } },
   "concepts": ["loop", "conditional", "obstacle-avoidance"],
-  "hints": ["levels:w1-l11.hint1", "levels:w1-l11.hint2"],
+  "hints": ["levels:w3-l11.hint1", "levels:w3-l11.hint2"],
   "visualStyle": "pov"
 }

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BlocklyEditor, type BlocklyEditorHandle } from '../blockly/BlocklyEditor';
-import { RobotGridCanvas } from '../engine/RobotGridCanvas';
+import { RobotGridCanvas, type RobotGridCanvasProps } from '../engine/RobotGridCanvas';
+import { PovGridCanvas } from '../engine/PovGridCanvas';
+import { GameBuilderCanvas } from '../engine/GameBuilderCanvas';
 import { createInitialState, type RobotState } from '../engine/robotGrid';
 import { runProgram, type ExecutionResult } from '../engine/runner';
 import { getAllLevels } from '../content/manifest';
@@ -12,9 +14,8 @@ import { findUnseenConcepts, getConceptInfo, type ConceptInfo } from '../content
 import { useStuckDetector } from './useStuckDetector';
 import type { StuckTier } from '../gamification/stuckDetector';
 import { Buddy, ConceptSteps } from './Buddy';
-import { ConfettiBurst } from './ConfettiBurst';
-import { XpToast } from './XpToast';
 import { SolutionPanel } from './SolutionPanel';
+import { LevelCompleteModal } from './LevelCompleteModal';
 import { getSolution } from '../content/solutions';
 import { compileSolutionToWorkspaceJson } from '../content/solutionCompiler';
 import type { Level } from '../content/types';
@@ -41,10 +42,12 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
   const [isPlaying, setIsPlaying] = useState(false);
   const [revealCode, setRevealCode] = useState(false);
   const [pythonCode, setPythonCode] = useState('');
-  const [completion, setCompletion] = useState<{ xpAwarded: number; stars: 0 | 1 | 2 | 3; newBadges: string[] } | null>(
-    null,
-  );
-  const [showXpToast, setShowXpToast] = useState(false);
+  const [completion, setCompletion] = useState<{
+    xpAwarded: number;
+    stars: 0 | 1 | 2 | 3;
+    newBadges: string[];
+    assisted: boolean;
+  } | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const seenConceptsRef = useRef<Set<string>>(new Set(profile.seenConcepts ?? []));
@@ -57,6 +60,13 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
   const [unlockedHints, setUnlockedHints] = useState(() => unlockedHintCount(profile, level.id));
   const [showSolutionPanel, setShowSolutionPanel] = useState(false);
   const [solutionBuilt, setSolutionBuilt] = useState(false);
+  // Scoring reads THIS, never the `solutionBuilt` state above: state updates
+  // are batched, so handleBuildSolution's synchronous setSolutionBuilt(true)
+  // followed immediately by handleRun() would otherwise have finishAtStep
+  // read the PRE-update (stale) value for the entire run, including every
+  // subsequent setInterval tick — silently scoring the very first "Build
+  // This For Me" per level as a genuine win. A ref has no such lag.
+  const solutionBuiltRef = useRef(false);
   const solution = getSolution(level.id);
 
   useEffect(() => {
@@ -66,6 +76,7 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
     setUnlockedHints(unlockedHintCount(profile, level.id));
     setShowSolutionPanel(false);
     setSolutionBuilt(false);
+    solutionBuiltRef.current = false;
     const unseen = findUnseenConcepts(level.concepts, Array.from(seenConceptsRef.current));
     setConceptIntro(unseen.length > 0 ? unseen : null);
     return () => {
@@ -79,8 +90,21 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
     const hasExistingBlocks = (blocklyRef.current?.countBlocks() ?? 0) > 0;
     if (hasExistingBlocks && !window.confirm(t('buddy:solution.buildConfirm'))) return;
     blocklyRef.current?.loadSolutionJson(compileSolutionToWorkspaceJson(solution.steps));
+    solutionBuiltRef.current = true;
     setSolutionBuilt(true);
     handleRun();
+  }
+
+  /** Fires on any real block-content change (BlocklyEditor's
+   * onWorkspaceChange — never for the solution-load itself, which is
+   * suppressed at the source). The kid actually did something to the
+   * workspace, so whatever it now contains is no longer "just what Buddy
+   * built" even if solutionBuiltRef was true a moment ago. */
+  function handleWorkspaceChange() {
+    if (solutionBuiltRef.current) {
+      solutionBuiltRef.current = false;
+      setSolutionBuilt(false);
+    }
   }
 
   function handleBuyHint() {
@@ -107,12 +131,17 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
     setStepIndex(0);
     setIsPlaying(false);
     setCompletion(null);
-    setShowXpToast(false);
     setMessage(null);
     setExplainOpen(false);
     setRobotState(createInitialState(level.goal));
     blocklyRef.current?.highlightBlock(null);
     startTimeRef.current = Date.now();
+    // Deliberately does NOT clear solutionBuilt: Reset only rewinds the
+    // robot/run state, it never touches the Blockly workspace (the "Reset"
+    // button has always meant "let me re-run", not "clear my blocks"). If
+    // the auto-built solution is still sitting there untouched, running it
+    // again is still assisted — solutionBuiltRef only clears via a REAL
+    // workspace edit (see handleWorkspaceChange) or a level change.
   }
 
   function finishAtStep(execResult: ExecutionResult, index: number) {
@@ -143,11 +172,23 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
           blocksUsed,
           movesUsed,
           timeSeconds,
+          assisted: solutionBuiltRef.current,
         });
         stuckDetector.reportSuccess();
+        // A kid can leave "How to Solve This Level" open and still win (via
+        // Build This For Me, or by just clicking Run themselves while it's
+        // open) — without this, its modal stays mounted behind the
+        // completion modal: two stacked `.modal-backdrop` dims compound into
+        // an over-darkened background, and two simultaneous
+        // role="dialog" aria-modal="true" elements is invalid ARIA.
+        setShowSolutionPanel(false);
         if (outcome) {
-          setCompletion({ xpAwarded: outcome.xpAwarded, stars: outcome.stars, newBadges: outcome.newBadges });
-          setShowXpToast(outcome.xpAwarded > 0);
+          setCompletion({
+            xpAwarded: outcome.xpAwarded,
+            stars: outcome.stars,
+            newBadges: outcome.newBadges,
+            assisted: outcome.assisted,
+          });
           setCurrentXp((xp) => xp + outcome.xpAwarded);
         }
       } else if (execResult.crashed) {
@@ -165,7 +206,6 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
     const execResult = runProgram(code, level.goal);
     setResult(execResult);
     setCompletion(null);
-    setShowXpToast(false);
     setMessage(null);
     setIsPlaying(true);
 
@@ -189,7 +229,6 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
       execResult = runProgram(code, level.goal);
       setResult(execResult);
       setCompletion(null);
-      setShowXpToast(false);
       setMessage(null);
       setStepIndex(0);
       finishAtStep(execResult, 0);
@@ -219,6 +258,20 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
 
   const hintKeys = level.hints;
   const worldMeta = getWorldMeta(level.worldId);
+
+  // Which scenario renderer draws the right-hand panel (DESIGN.md "Scenario
+  // visual styles"). The engine/goal/solution never change across styles —
+  // all three renderers take the exact same props (RobotGridCanvasProps).
+  const scenarioProps: RobotGridCanvasProps = {
+    goal: level.goal,
+    robotState,
+    robotGlyph: worldMeta.robotGlyph,
+    crashGlyph: worldMeta.crashGlyph,
+    targetGlyph: worldMeta.targetGlyph,
+    obstacleGlyph: worldMeta.obstacleGlyph,
+  };
+  const ScenarioCanvas =
+    level.visualStyle === 'pov' ? PovGridCanvas : level.visualStyle === 'game-builder' ? GameBuilderCanvas : RobotGridCanvas;
 
   return (
     <div className="level-play">
@@ -266,13 +319,13 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
             ref={blocklyRef}
             toolboxRef={level.tier === 'icon' ? 'icon' : 'block-text'}
             startingWorkspace={level.startingWorkspace}
+            onWorkspaceChange={handleWorkspaceChange}
           />
         </div>
 
         <div className="level-play__scenario">
           <div className="level-play__canvas-wrap">
-            <RobotGridCanvas goal={level.goal} robotState={robotState} targetGlyph={worldMeta.targetGlyph} />
-            {completion && <ConfettiBurst burstKey={level.id} />}
+            <ScenarioCanvas {...scenarioProps} />
           </div>
 
           <div className="level-play__controls">
@@ -340,46 +393,22 @@ export function LevelPlay({ level, profile, onBackToMap, onNextLevel }: LevelPla
             </pre>
           )}
 
-          {completion && (
-            <div className="level-complete-panel">
-              <p className="level-complete-panel__stars" aria-label={`${completion.stars} stars`}>
-                {Array.from({ length: 3 }, (_, i) => (
-                  <span
-                    key={i}
-                    className={i < completion.stars ? 'star-pop star-pop--earned' : 'star-pop star-pop--empty'}
-                    style={{ ['--star-index' as string]: i }}
-                    aria-hidden="true"
-                  >
-                    {i < completion.stars ? '⭐' : '☆'}
-                  </span>
-                ))}
-              </p>
-              {completion.newBadges.map((badgeId) => (
-                <p key={badgeId} className="level-complete-panel__badge">
-                  {'✓ '}
-                  {t('ui:badgeEarnedToast', { badge: t(`ui:badges.${toCamel(badgeId)}`) })}
-                </p>
-              ))}
-              <button type="button" className="btn btn-primary" onClick={() => onNextLevel(nextLevel)}>
-                {t('levelPlay.nextLevel')}
-              </button>
-            </div>
-          )}
-
-          {showXpToast && completion && completion.xpAwarded > 0 && (
-            <XpToast
-              message={t('ui:xpToast', { xp: completion.xpAwarded })}
-              onDismiss={() => setShowXpToast(false)}
-            />
-          )}
         </div>
       </div>
+
+      {completion && (
+        <LevelCompleteModal
+          levelId={level.id}
+          stars={completion.stars}
+          assisted={completion.assisted}
+          newBadges={completion.newBadges}
+          xpAwarded={completion.xpAwarded}
+          onNextLevel={() => onNextLevel(nextLevel)}
+          onBackToMap={onBackToMap}
+        />
+      )}
     </div>
   );
-}
-
-function toCamel(id: string): string {
-  return id.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 }
 
 interface StuckBuddyProps {

@@ -22,6 +22,8 @@ const BADGE_ICONS: Record<string, string> = {
   perfectionist: '\u{2B50}', // star
   'world-1-complete': '\u{1F916}', // robot
   'world-2-complete': '\u{1F9EA}', // test tube
+  'world3-complete': '\u{1F4BB}', // laptop
+  'world4-complete': '\u{1F3AE}', // game controller
 };
 
 function formatDate(iso: string, locale: string): string {
